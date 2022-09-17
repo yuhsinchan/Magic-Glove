@@ -136,14 +136,24 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
-logic keydown;
+logic keydown, keypick;
 logic [3:0] random_value;
+logic [3:0] pick_random_value;
+logic [3:0] prev_random_value;
+logic [3:0] prev_prev_random_value;
 
 Debounce deb0(
 	.i_in(KEY[0]),
 	.i_rst_n(KEY[1]),
 	.i_clk(CLOCK_50),
 	.o_neg(keydown)
+);
+
+Debounce deb0(
+	.i_in(KEY[2]),
+	.i_rst_n(KEY[1]),
+	.i_clk(CLOCK_50),
+	.o_neg(keypick)
 );
 
 Top top0(
@@ -153,18 +163,42 @@ Top top0(
 	.o_random_out(random_value)
 );
 
+PreviousValue prev_value0(
+	.i_clk(CLOCK_50),
+	.i_rst_n(KEY[1]),
+	.i_start(keydown),
+	.i_random_in(random_value),
+	.o_pick_random_out(prev_random_value),
+);
+
+Picker picker0(
+	.i_clk(CLOCK_50),
+	.i_rst_n(KEY[1]),
+	.i_pick(keypick),
+	.i_random_in(random_value),
+	.o_pick_random_out(pick_random_value),
+);
+
 SevenHexDecoder seven_dec0(
 	.i_hex(random_value),
 	.o_seven_ten(HEX1),
 	.o_seven_one(HEX0)
 );
 
+SevenHexDecoder seven_dec1(
+	.i_hex(prev_random_value),
+	.o_seven_ten(HEX5),
+	.o_seven_one(HEX4)
+);
+
+SevenHexDecoder seven_dec2(
+	.i_hex(pick_random_value),
+	.o_seven_ten(HEX7),
+	.o_seven_one(HEX6)
+);
+
 assign HEX2 = '1;
 assign HEX3 = '1;
-assign HEX4 = '1;
-assign HEX5 = '1;
-assign HEX6 = '1;
-assign HEX7 = '1;
 
 `ifdef DUT_LAB1
 	initial begin
