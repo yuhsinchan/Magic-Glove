@@ -1,0 +1,6 @@
+*.log
+*.rc
+*.conf
+nWaveLog
+spyglass-1
+INCA_libs

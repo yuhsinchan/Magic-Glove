@@ -1,0 +1,3 @@
+s1(14Sep2022:23:54:02):  ncverilog tb_Top.sv ./../src/Top_example.sv +access+rw 
+s2(15Sep2022:14:12:44):  ncverilog tb_Top.sv ./ ../src/Top_example.sv +access+rw 
+s3(15Sep2022:14:12:53):  ncverilog tb_Top.sv ../src/Top_example.sv +access+rw 
