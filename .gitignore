@@ -4,3 +4,6 @@
 nWaveLog
 spyglass-1
 INCA_libs
+./sim/BSSLib.lib++
+./sim/*.history
+./sim/*.fsdb
