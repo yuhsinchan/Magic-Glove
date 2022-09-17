@@ -158,6 +158,7 @@ Top top0(
 PreviousValue prev_value0(
 	.i_clk(CLOCK_50),
 	.i_rst_n(KEY[1]),
+	.i_start(keydown),
 	.i_random_out(random_value),
 	.o_prev_random_out(prev_random_value),
 	.o_prev_prev_random_out(prev_prev_random_value)
