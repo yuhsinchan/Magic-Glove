@@ -5,7 +5,7 @@ module Pseudo_random (
 );
 
 // a pseudo random generator with LFSR method
-parameter INITIAL_VAL = 32d'1736038838;
+parameter INITIAL_VAL = 32'd1736038838;
 
 logic [3:0] o_lfsr_random;
 logic [31:0] lfsr_internal_r;
