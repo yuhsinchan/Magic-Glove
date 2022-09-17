@@ -39,9 +39,9 @@ module Top (
     always_comb begin
         // default values
         state_w = state_r;
-        jingyuanhaochaing_w <= jingyuanhaochaing_r;
-        comparator_w <= comparator_r;
-        counter_w <= counter_r;
+        jingyuanhaochaing_w = jingyuanhaochaing_r;
+        comparator_w = comparator_r;
+        counter_w = counter_r;
 
         // FSM
         case (state_r)
