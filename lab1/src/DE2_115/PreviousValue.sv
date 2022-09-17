@@ -1,5 +1,7 @@
 module PreviousValue (
-	input  [3:0] i_random_out,
+	input        i_clk,
+    input        i_rst_n,
+    input  [3:0] i_random_out,
 	output [3:0] o_prev_random_out,
 	output [3:0] o_prev_prev_random_out
 );
