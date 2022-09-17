@@ -149,7 +149,7 @@ Debounce deb0(
 	.o_neg(keydown)
 );
 
-Debounce deb0(
+Debounce deb1(
 	.i_in(KEY[2]),
 	.i_rst_n(KEY[1]),
 	.i_clk(CLOCK_50),
@@ -168,7 +168,7 @@ PreviousValue prev_value0(
 	.i_rst_n(KEY[1]),
 	.i_start(keydown),
 	.i_random_in(random_value),
-	.o_pick_random_out(prev_random_value),
+	.o_prev_random_out(prev_random_value),
 );
 
 Picker picker0(

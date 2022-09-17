@@ -3,7 +3,7 @@ module Picker (
   input        i_rst_n,
   input        i_pick,
   input  [3:0] i_random_in,
-	output [3:0] o_pick_random_out,
+	output [3:0] o_pick_random_out
 );
 
 
