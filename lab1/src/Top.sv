@@ -11,6 +11,8 @@ module Top (
     parameter S_IDLE = 2'b00;
     parameter S_GEN = 2'b01;
     parameter S_DONE = 2'b10;
+	 parameter threshold = {24{1'b1}};
+	 parameter incre = {20{1'b1}};
 
     // output buffers
     logic [3:0] o_random_out_r, o_random_out_w;
@@ -19,14 +21,14 @@ module Top (
     logic [1:0] state_r, state_w;
     logic [31:0] counter_r, counter_w;
     logic [31:0] comparator_r, comparator_w;
+	 
+	 logic [31:0] x_r, x_w;
+	 logic [31:0] interval_r, interval_w;
 
     logic jingyuanhaochaing_r, jingyuanhaochaing_w;
 
-    logic [31:0] threshold;
-
     // output assignment
     assign o_random_out = o_random_out_r;
-    assign threshold = {26{1'b1}};
 
     // init random module
     Pseudo_random random (
@@ -42,6 +44,8 @@ module Top (
         jingyuanhaochaing_w = jingyuanhaochaing_r;
         comparator_w = comparator_r;
         counter_w = counter_r;
+		  interval_w = interval_r;
+		  x_w = x_r;
 
         // FSM
         case (state_r)
@@ -53,33 +57,49 @@ module Top (
 
             S_GEN: begin
                 if (counter_r == comparator_r) begin
-                    state_w = (counter_r == threshold) ? S_IDLE : state_w;
+                    state_w = (interval_r >= threshold) ? S_DONE : state_w;
                     jingyuanhaochaing_w = 1'b1;
-                    comparator_w = comparator_r << 1;
+                    comparator_w = comparator_r + interval_r;
+						  x_w = x_r + 1<<18;
+						  interval_w = interval_r + x_r * 2;
                 end else begin
                     counter_w = counter_r + 1;
                     jingyuanhaochaing_w = 1'b0;
                 end
             end
+				
+				S_DONE: begin
+					 counter_w = 32'b0;
+					 comparator_w = 32'b0;
+					 state_w = S_IDLE;
+					 interval_w = 32'b0;
+					 x_w = {20{1'b1}};
+				end
         endcase
     end
 
 
     // sequential circuit
-    always_ff @(posedge i_clk or posedge i_rst_n) begin
+    always_ff @(posedge i_clk or negedge i_rst_n) begin
         // reset
-        if (i_rst_n) begin
+        if (!i_rst_n) begin
             state_r <= S_IDLE;
             o_random_out_r <= 4'b0;
             jingyuanhaochaing_r <= 1'b0;
             counter_r <= 32'b0;
             comparator_r <= 32'b1;
+				interval_r <= 32'b0;
+				x_r <= {20{1'b1}};
         end else begin
             state_r <= state_w;
-            o_random_out_r <= o_random_out_w;
+				if (state_w == S_GEN) begin
+					 o_random_out_r <= o_random_out_w;
+				end
             jingyuanhaochaing_r <= jingyuanhaochaing_w;
             counter_r <= counter_w;
             comparator_r <= comparator_w;
+				interval_r <= interval_w;
+				x_r <= x_w;
         end
     end
 

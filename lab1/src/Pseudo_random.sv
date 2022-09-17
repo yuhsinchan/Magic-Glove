@@ -29,9 +29,9 @@ always_comb begin
     o_lfsr_random_out_w = lfsr_internal_r[3:0];
 end
 
-always_ff @(negedge i_jingyuanhaochiang or posedge i_reset) begin
+always_ff @(posedge i_jingyuanhaochiang or negedge i_reset) begin
 	 jingyuanhaochiang_r <= i_jingyuanhaochiang;
-    if (i_reset) begin
+    if (!i_reset) begin
         lfsr_internal_r <= INITIAL_VAL;
     end else begin
         lfsr_internal_r <= lfsr_internal_w;
