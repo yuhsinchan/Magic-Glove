@@ -7,13 +7,23 @@ module PreviousValue (
 );
 
   // ===== Output Buffers =====
-  logic [3:0] o_random_out_r;
-  logic [3:0] o_prev_random_out_r;
-  logic [3:0] o_prev_prev_random_out_r;
+  logic [3:0] o_random_out_r, o_random_out_w;
+  logic [3:0] o_prev_random_out_r, o_prev_random_out_w;
+  logic [3:0] o_prev_prev_random_out_r, o_prev_prev_random_out_w;
 
   // ===== Output Assignments =====
   assign o_prev_prev_random_out = o_prev_prev_random_out_r;
   assign o_prev_random_out = o_prev_random_out_r;
+
+
+  // ===== Combinational Circuits =====
+  always_comb begin
+    if (i_random_out != o_random_out_r) begin
+        o_prev_prev_random_out_w = o_prev_random_out_r
+        o_prev_random_out_w = o_random_out_r
+        o_random_out_w = i_random_out
+    end
+  end
 
   // ===== Sequential Circuits =====
   always_ff @(posedge i_clk or negedge i_rst_n) begin
@@ -23,9 +33,9 @@ module PreviousValue (
       o_prev_random_out_r <= 4'd0;
       o_random_out_r <= 4'd0;
     end else begin
-      o_prev_prev_random_out_r <= o_prev_random_out_r;
-      o_prev_random_out_r <= o_random_out_r;
-      o_random_out_r <= i_random_out;
+      o_prev_prev_random_out_r <= o_prev_random_out_w;
+      o_prev_random_out_r <= o_random_out_w;
+      o_random_out_r <= i_random_out_w;
     end
   end
 
