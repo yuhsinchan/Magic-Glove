@@ -26,7 +26,10 @@ always_comb begin
         lfsr_internal_w = lfsr_internal_r << 1;
         lfsr_internal_w[0] = tmp_w;
     end
-    o_lfsr_random_out_w = lfsr_internal_r[3:0];
+    o_lfsr_random_out_w[0] = lfsr_internal_r[0];
+	 o_lfsr_random_out_w[1] = lfsr_internal_r[8];
+	 o_lfsr_random_out_w[2] = lfsr_internal_r[16];
+	 o_lfsr_random_out_w[3] = lfsr_internal_r[24];
 end
 
 always_ff @(posedge i_jingyuanhaochiang or negedge i_reset) begin
