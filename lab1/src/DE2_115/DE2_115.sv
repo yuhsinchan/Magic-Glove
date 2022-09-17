@@ -136,8 +136,9 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
-logic keydown;
+logic keydown, keypick;
 logic [3:0] random_value;
+logic [3:0] pick_random_value;
 logic [3:0] prev_random_value;
 logic [3:0] prev_prev_random_value;
 
@@ -146,6 +147,13 @@ Debounce deb0(
 	.i_rst_n(KEY[1]),
 	.i_clk(CLOCK_50),
 	.o_neg(keydown)
+);
+
+Debounce deb0(
+	.i_in(KEY[2]),
+	.i_rst_n(KEY[1]),
+	.i_clk(CLOCK_50),
+	.o_neg(keypick)
 );
 
 Top top0(
@@ -159,9 +167,16 @@ PreviousValue prev_value0(
 	.i_clk(CLOCK_50),
 	.i_rst_n(KEY[1]),
 	.i_start(keydown),
-	.i_random_out(random_value),
-	.o_prev_random_out(prev_random_value),
-	.o_prev_prev_random_out(prev_prev_random_value)
+	.i_random_in(random_value),
+	.o_pick_random_out(prev_random_value),
+);
+
+Picker picker0(
+	.i_clk(CLOCK_50),
+	.i_rst_n(KEY[1]),
+	.i_pick(keypick),
+	.i_random_in(random_value),
+	.o_pick_random_out(pick_random_value),
 );
 
 SevenHexDecoder seven_dec0(
@@ -177,7 +192,7 @@ SevenHexDecoder seven_dec1(
 );
 
 SevenHexDecoder seven_dec2(
-	.i_hex(prev_prev_random_value),
+	.i_hex(pick_random_value),
 	.o_seven_ten(HEX7),
 	.o_seven_one(HEX6)
 );

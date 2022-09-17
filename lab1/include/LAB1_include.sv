@@ -1,5 +1,6 @@
 `include "Top.sv"
 //`include "Random.sv"
+`include "DE2_115/Picker.sv"
 `include "DE2_115/PreviousValue.sv"
 `include "DE2_115/SevenHexDecoder.sv"
 `include "DE2_115/Debounce.sv"
