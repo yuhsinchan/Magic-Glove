@@ -53,7 +53,7 @@ module Top (
 
             S_GEN: begin
                 if (counter_r == comparator_r) begin
-                    state_w = (counter_r == threshold) ? S_DONE : state_w;
+                    state_w = (counter_r == threshold) ? S_IDLE : state_w;
                     jingyuanhaochaing_w = 1'b1;
                     comparator_w = comparator_r << 1;
                 end else begin
