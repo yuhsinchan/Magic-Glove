@@ -24,6 +24,7 @@ assert len(enc) % 32 == 0
 s.write(key)
 for i in range(0, len(enc), 32):
     s.write(enc[i:i+32])
+    print("read bits")
     dec = s.read(31)
     fp_dec.write(dec)
 
