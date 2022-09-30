@@ -15,11 +15,13 @@ localparam STATUS_BASE = 2*4;
 localparam TX_OK_BIT   = 6;
 localparam RX_OK_BIT   = 7;
 
-// Feel free to design your own FSM!
-localparam S_GET_KEY = 0;
-localparam S_GET_DATA = 1;
-localparam S_WAIT_CALCULATE = 2;
-localparam S_SEND_DATA = 3;
+// Follow the finite state machine on pages 25.
+localparam S_QUERY_RX = 0;
+localparam S_READ = 1;
+localparam S_CALC = 2;
+localparam S_QUERY_TX = 3;
+localparam S_WRITE = 4; 
+
 
 logic [255:0] n_r, n_w, d_r, d_w, enc_r, enc_w, dec_r, dec_w;
 logic [1:0] state_r, state_w;
@@ -47,16 +49,14 @@ Rsa256Core rsa256_core(
     .o_finished(rsa_finished)
 );
 
-task StartRead;
-    input [4:0] addr;
+task StartRead (input [4:0] addr);
     begin
         avm_read_w = 1;
         avm_write_w = 0;
         avm_address_w = addr;
     end
 endtask
-task StartWrite;
-    input [4:0] addr;
+task StartWrite (input [4:0] addr);
     begin
         avm_read_w = 0;
         avm_write_w = 1;
@@ -66,6 +66,26 @@ endtask
 
 always_comb begin
     // TODO
+    case(state_r)
+        S_QUERY_RX: begin
+            
+        end
+        S_READ: begin
+
+        end
+        S_CALC: begin
+            
+        end
+        S_QUERY_TX: begin
+
+        end
+        S_WRITE: begin
+
+        end
+        default: begin
+
+        end
+    endcase
 end
 
 always_ff @(posedge avm_clk or posedge avm_rst) begin
@@ -77,8 +97,8 @@ always_ff @(posedge avm_clk or posedge avm_rst) begin
         avm_address_r <= STATUS_BASE;
         avm_read_r <= 1;
         avm_write_r <= 0;
-        state_r <= S_GET_KEY;
-        bytes_counter_r <= 63;
+        state_r <= S_QUERY_RX;
+        bytes_counter_r <= 0;
         rsa_start_r <= 0;
     end else begin
         n_r <= n_w;
