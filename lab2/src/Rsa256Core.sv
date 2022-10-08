@@ -30,11 +30,7 @@ logic mont_m_finish_r;
 logic mont_m_out_w;
 logic mont_t_out_w;
 logic o_finished_w, o_finished_r;
-logic mont_t_reset_w;
-logic mont_m_reset_w;
 logic [255:0] enc_r, enc_w;
-assign i_m_rst = mont_m_reset_w | i_rst;
-assign i_t_rst = mont_t_reset_w | i_rst;
 
 assign o_finished = o_finished_r;
 assign o_a_pow_d = m_r;
@@ -129,7 +125,7 @@ always_comb begin
     endcase
 end
 
-always_ff @(posedge i_start or posedge i_clk or posedge i_rst or counter_w) begin
+always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
         o_finished_r <= 0;
         enc_r <= 0;
@@ -170,6 +166,8 @@ logic o_finished_r, o_finished_w;
 logic [255:0] output_r, output_w;
 reg started_r;
 logic started_w;
+logic next_counter_w;
+assign next_counter_w = counter_r[0] ^ counter_w[0];
 
 assign o_finished = o_finished_r;
 assign o_prep = output_r;
@@ -187,7 +185,7 @@ always_comb begin
         end
     end
 end
-always_ff @(posedge i_start or counter_w or posedge i_rst) begin
+always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
     if (i_rst) begin
         started_r <= 0;
         o_finished_r <= 0;
@@ -210,8 +208,8 @@ always_ff @(posedge i_start or counter_w or posedge i_rst) begin
         while (tmp_r >= i_n) begin
             tmp_r = tmp_r - i_n;
         end
+        output_r <= output_w;
     end
-    output_r <= output_w;
 end
 endmodule
 
@@ -233,9 +231,11 @@ logic [258:0] m_r, m_w;
 logic [255:0] output_r, output_w;
 logic o_finished_r, o_finished_w;
 logic started_r, started_w;
+logic next_counter_w;
 
 assign o_finished = o_finished_r;
 assign o_mont = output_r;
+assign next_counter_w = counter_r[0] ^ counter_w[0];
 
 always_comb begin
     o_finished_w = o_finished_r;
@@ -256,7 +256,7 @@ always_comb begin
     end
 end
 
-always_ff @(posedge i_start or posedge i_rst or counter_w) begin
+always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
     if (i_rst) begin
         started_r <= 0;
         o_finished_r <= 0;
@@ -281,9 +281,10 @@ always_ff @(posedge i_start or posedge i_rst or counter_w) begin
                 m_r = m_r + i_n;
             end
             m_r = m_r >> 1;
-            output_r <= output_w;
         end
+        output_r <= output_w;
     end
+    
 end
 
 endmodule
