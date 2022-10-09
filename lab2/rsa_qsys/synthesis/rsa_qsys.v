@@ -7,7 +7,9 @@ module rsa_qsys (
 		input  wire  clk_clk,                        //                        clk.clk
 		input  wire  reset_reset_n,                  //                      reset.reset_n
 		input  wire  uart_0_external_connection_rxd, // uart_0_external_connection.rxd
-		output wire  uart_0_external_connection_txd  //                           .txd
+		output wire  uart_0_external_connection_txd, //                           .txd
+		output wire [2:0]  state,
+		output wire [6:0] total_len
 	);
 
 	wire         altpll_0_c0_clk;                           // altpll_0:c0 -> [Rsa_Wrapper_0:avm_clk, mm_interconnect_0:altpll_0_c0_clk, rst_controller:clk, uart_0:clk]
@@ -35,7 +37,9 @@ module rsa_qsys (
 		.avm_writedata   (rsa_wrapper_0_avalon_master_0_writedata),   //                .writedata
 		.avm_waitrequest (rsa_wrapper_0_avalon_master_0_waitrequest), //                .waitrequest
 		.avm_clk         (altpll_0_c0_clk),                           //      clock_sink.clk
-		.avm_rst         (rst_controller_reset_out_reset)             //      reset_sink.reset
+		.avm_rst         (rst_controller_reset_out_reset),             //      reset_sink.reset
+		.state			 (state),
+		.total_len       (total_len)
 	);
 
 	rsa_qsys_altpll_0 altpll_0 (

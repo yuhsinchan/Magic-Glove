@@ -136,12 +136,48 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
+logic [2:0] state;
+logic [6:0] total_len;
+logic bitmode;
+
+Debounce deb0(
+	.i_in(KEY[1]),
+	.i_rst_n(KEY[0]),
+	.i_clk(CLOCK_50),
+	.o_neg(keydown)
+);
+
+SevenHexDecoder seven_dec1(
+	.i_hex(total_len),
+	.o_seven_ten(HEX5),
+	.o_seven_one(HEX4)
+);
+
+SevenHexDecoder seven_dec2(
+	.i_hex(state),
+	.o_seven_ten(HEX7),
+	.o_seven_one(HEX6)
+);
+
+SevenHexDecoder_progress seven_dec3(
+	.i_clk(CLOCK_50),
+	.i_rst_n(KEY[0]),
+	.i_start(keydown),
+	.o_seven_a(HEX3),
+	.o_seven_b(HEX2),
+	.o_seven_c(HEX1),
+	.o_seven_d(HEX0),
+	.o_mode(bitmode)
+);
+
 // please replace this module with the qsys module you generated and connect all the ports
 rsa_qsys my_qsys(
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(KEY[0]),
 	.uart_0_external_connection_rxd(UART_RXD),
-	.uart_0_external_connection_txd(UART_TXD)
+	.uart_0_external_connection_txd(UART_TXD),
+	.state(state),
+	.total_len(total_len)
 );
 
 endmodule

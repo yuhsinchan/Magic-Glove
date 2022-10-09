@@ -6,7 +6,9 @@ module Rsa256Wrapper (
     input  [31:0] avm_readdata,
     output        avm_write,
     output [31:0] avm_writedata,
-    input         avm_waitrequest
+    input         avm_waitrequest,
+    output [2:0]  state,
+    output [6:0]  total_len
 );
 
     localparam RX_BASE = 0 * 4;
@@ -32,11 +34,15 @@ module Rsa256Wrapper (
     logic rsa_start_r, rsa_start_w;
     logic rsa_finished;
     logic [255:0] rsa_dec;
+    logic [128:0] counter_r, counter_w;
+    logic [6:0] total_len_r, total_len_w;
 
     assign avm_address = avm_address_r;
     assign avm_read = avm_read_r;
     assign avm_write = avm_write_r;
     assign avm_writedata = dec_r[247-:8];
+    assign state = state_r;
+    assign total_len = total_len_r;
 
     Rsa256Core rsa256_core (
         .i_clk(avm_clk),
@@ -77,8 +83,11 @@ module Rsa256Wrapper (
         rsa_start_w = rsa_start_r;
 
         avm_address_w = avm_address_r;
-        avm_read_w = avm_read_w;
-        avm_write_w = avm_write_w;
+        avm_read_w = avm_read_r;
+        avm_write_w = avm_write_r;
+
+        total_len_w = total_len_r;
+        counter_w = counter_r + 1;
 
         // TODO
         case (state_r)
@@ -108,7 +117,7 @@ module Rsa256Wrapper (
                         enc_w   = {enc_r[247:0], avm_readdata[7:0]};
                     end else begin
                         state_w = S_CALC;
-                        enc_w = {enc_r[247:0], avm_address_w[7:0]};
+                        enc_w = {enc_r[247:0], avm_readdata[7:0]};
                         bytes_counter_w = 0;
                         rsa_start_w = 1;
                         avm_read_w = 0;
@@ -126,6 +135,7 @@ module Rsa256Wrapper (
                     StartWrite(TX_BASE);
                     state_w = S_WRITE;
                     bytes_counter_w = bytes_counter_w + 1;
+                    total_len_w = total_len_r + 1;
                 end else begin
                     StartRead(STATUS_BASE);
                     state_w = state_r;
@@ -134,8 +144,9 @@ module Rsa256Wrapper (
             S_WRITE: begin
                 if (~avm_waitrequest) begin
                     StartRead(STATUS_BASE);
-                    if (bytes_counter_w == 31) begin
+                    if (bytes_counter_r == 31) begin
                         state_w = S_QUERY_RX;
+                        bytes_counter_w = 64;
                     end else begin
                         state_w = S_QUERY_TX;
                         dec_w   = {dec_r[247:0], dec_r[255:248]};
@@ -160,6 +171,21 @@ module Rsa256Wrapper (
             state_r <= S_QUERY_RX;
             bytes_counter_r <= 0;
             rsa_start_r <= 0;
+            counter_r <= 0;
+            total_len_r <= 0;
+        end else if (counter_r == 200000000) begin // use for auto reset
+            n_r <= 0;
+            d_r <= 0;
+            enc_r <= 0;
+            dec_r <= 0;
+            avm_address_r <= STATUS_BASE;
+            avm_read_r <= 1;
+            avm_write_r <= 0;
+            state_r <= S_QUERY_RX;
+            bytes_counter_r <= 0;
+            rsa_start_r <= 0;
+            counter_r <= 0;
+            total_len_r <= 0;   
         end else begin
             n_r <= n_w;
             d_r <= d_w;
@@ -171,6 +197,8 @@ module Rsa256Wrapper (
             state_r <= state_w;
             bytes_counter_r <= bytes_counter_w;
             rsa_start_r <= rsa_start_w;
+            counter_r <= counter_w;
+            total_len_r <= total_len_w;
         end
     end
 
