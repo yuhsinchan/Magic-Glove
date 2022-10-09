@@ -78,6 +78,10 @@ always_comb begin
     counter_w = counter_r;
     o_finished_w = o_finished_r;
     enc_w = enc_r;
+    state_w = state_r;
+    prep_start_w = prep_start_r;
+    mont_t_start_w = mont_t_start_r;
+    mont_m_start_w = mont_m_start_r;
     case (state_r)
         S_IDLE: begin
             if (i_start) begin
@@ -85,7 +89,7 @@ always_comb begin
             end
         end
         S_PREP: begin
-            if (prep_finish_r && prep_start_w) begin
+            if (prep_finish_r && prep_start_r) begin
                 state_w = S_MONT;
                 t_w = prep_result_r;
                 prep_start_w = 0;
@@ -96,7 +100,7 @@ always_comb begin
         end
         S_MONT: begin
             // t finishes, m finishes if it starts
-            if ((mont_t_finish_r && mont_t_start_w) && (!i_d[counter_r] || (mont_m_finish_r && mont_m_start_w))) begin
+            if ((mont_t_finish_r && mont_t_start_r) && (!i_d[counter_r] || (mont_m_finish_r && mont_m_start_r))) begin
                 state_w = S_CALC;
                 mont_m_start_w = 0;
                 mont_t_start_w = 0;
@@ -129,22 +133,28 @@ always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
         o_finished_r <= 0;
         enc_r <= 0;
-    end
-    if (i_start) begin
-        enc_r <= i_a;
-        state_r <= S_PREP;
-        m_r <= 1;
-        n_r <= i_n;
-        counter_r <= 0;
-        o_finished_r <= 0;
+        prep_start_r <= 0;
     end
     else begin
-        state_r <= state_w;
-        m_r <= m_w;
-        t_r <= t_w;
-        n_r <= n_w;
-        counter_r <= counter_w;
-        o_finished_r <= o_finished_w;
+        if (i_start) begin
+            enc_r <= i_a;
+            state_r <= S_PREP;
+            m_r <= 1;
+            n_r <= i_n;
+            counter_r <= 0;
+            o_finished_r <= 0;
+        end
+        else begin
+            state_r <= state_w;
+            m_r <= m_w;
+            t_r <= t_w;
+            n_r <= n_w;
+            counter_r <= counter_w;
+            o_finished_r <= o_finished_w;
+        end
+        prep_start_r <= prep_start_w;
+        mont_m_start_r <= mont_m_start_w;
+        mont_t_start_r <= mont_t_start_w;
     end
 end
 endmodule
