@@ -93,6 +93,7 @@ always_comb begin
                 state_w = S_MONT;
                 t_w = prep_result_r;
                 prep_start_w = 0;
+                $display("t: %64x", t_w);
             end
             else begin
                 prep_start_w = 1;  
@@ -185,12 +186,17 @@ assign o_prep = output_r;
 always_comb begin
     started_w = started_r;
     o_finished_w = o_finished_r;
+    counter_w = counter_r;
+    tmp_w = tmp_r;
+    output_w = output_r;
+    while (tmp_w >= i_n) begin
+        tmp_w = tmp_w - i_n;
+    end
     if (o_finished_r == 0 && started_r) begin
         counter_w = counter_r - 1;
-        tmp_w = tmp_r;
         if (counter_w == 0) begin
             o_finished_w = 1;
-            output_w = tmp_r;
+            output_w = tmp_w;
             started_w = 0;
         end
     end
@@ -207,17 +213,17 @@ always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
         if (started_r == 0) begin
             counter_r <= i_bits + 1;
             o_finished_r <= 0;
-            tmp_r[255:0] <= i_y;
+            tmp_r <= i_y;
             started_r <= 1;
         end
         else begin
             counter_r <= counter_w;
-            tmp_r = tmp_w << 1;
+            tmp_r <= tmp_w << 1;
             o_finished_r <= o_finished_w;
         end
-        while (tmp_r >= i_n) begin
-            tmp_r = tmp_r - i_n;
-        end
+        // while (tmp_r >= i_n) begin
+        //     tmp_r = tmp_r - i_n;
+        // end
         output_r <= output_w;
     end
 end
