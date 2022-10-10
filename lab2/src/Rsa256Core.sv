@@ -93,7 +93,6 @@ always_comb begin
                 state_w = S_MONT;
                 t_w = prep_result_r;
                 prep_start_w = 0;
-                $display("t: %64x", t_w);
             end
             else begin
                 prep_start_w = 1;  
@@ -116,6 +115,7 @@ always_comb begin
             end
         end
         S_CALC: begin
+            // 255
             if (counter_r == 255) begin
                 m_w = m_r;
                 state_w = S_IDLE;
@@ -135,6 +135,7 @@ always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
         o_finished_r <= 0;
         enc_r <= 0;
         prep_start_r <= 0;
+        state_r <= S_IDLE;
     end
     else begin
         if (i_start) begin
@@ -189,7 +190,7 @@ always_comb begin
     counter_w = counter_r;
     tmp_w = tmp_r;
     output_w = output_r;
-    while (tmp_w >= i_n) begin
+    if (tmp_w >= i_n) begin
         tmp_w = tmp_w - i_n;
     end
     if (o_finished_r == 0 && started_r) begin
@@ -257,16 +258,27 @@ always_comb begin
     o_finished_w = o_finished_r;
     started_w = started_r;
     m_w = m_r;
+    counter_w = counter_r;
+    output_w = output_r;
     if (!o_finished_r && started_r) begin
         counter_w = counter_r - 1;
+        if (i_a[255 - counter_w]) begin
+            m_w = m_w + i_b;
+        end
+        if (m_w[0] == 1) begin
+            m_w = m_w + i_n;
+        end
+        m_w = m_w >> 1;
+        // $display("counter: %d", counter_w);
+        // $display("m_w: %64x", m_w);
         if (!counter_w) begin
             o_finished_w = 1;
             started_w = 0;
-            if (m_r >= i_n) begin
-                output_w = m_r - i_n;
+            if (m_w >= i_n) begin
+                output_w = m_w - i_n;
             end
             else begin
-                output_w = m_r;
+                output_w = m_w;
             end
         end
     end
@@ -280,8 +292,9 @@ always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
     end
     else if (i_start) begin
         if (!started_r) begin
+            // $display("i_a: %b", i_a);
             m_r <= 259'b0;
-            counter_r <= i_bits + 1;
+            counter_r <= i_bits;
             started_r <= 1;
             o_finished_r <= 0;
         end
@@ -289,14 +302,14 @@ always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
             o_finished_r <= o_finished_w;
             counter_r <= counter_w;
             started_r <= started_w;
-            m_r = m_w;
-            if (i_a[256 - counter_w]) begin
-                m_r = m_r + i_b;
-            end
-            if (m_r[0] == 1) begin
-                m_r = m_r + i_n;
-            end
-            m_r = m_r >> 1;
+            m_r <= m_w;
+            // if (i_a[256 - counter_w]) begin
+            //     m_r = m_r + i_b;
+            // end
+            // if (m_r[0] == 1) begin
+            //     m_r = m_r + i_n;
+            // end
+            // m_r = m_r >> 1;
         end
         output_r <= output_w;
     end
