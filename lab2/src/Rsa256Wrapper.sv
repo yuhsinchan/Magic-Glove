@@ -7,8 +7,8 @@ module Rsa256Wrapper (
     output        avm_write,
     output [31:0] avm_writedata,
     input         avm_waitrequest,
-    output [2:0]  state,
-    output [6:0]  total_len
+    output [ 2:0] state,
+    output [ 6:0] total_len
 );
 
     localparam RX_BASE = 0 * 4;
@@ -26,7 +26,7 @@ module Rsa256Wrapper (
 
 
     logic [255:0] n_r, n_w, d_r, d_w, enc_r, enc_w, dec_r, dec_w;
-    logic [1:0] state_r, state_w;
+    logic [2:0] state_r, state_w;
     logic [6:0] bytes_counter_r, bytes_counter_w;
     logic [4:0] avm_address_r, avm_address_w;
     logic avm_read_r, avm_read_w, avm_write_r, avm_write_w;
@@ -126,15 +126,18 @@ module Rsa256Wrapper (
             end
             S_CALC: begin
                 if (rsa_finished) begin
+                    // $display("rsa finished");
+                    // $display("dec: %64x", rsa_dec);
                     state_w = S_QUERY_TX;
-                    rsa_start_w = 0;
+                    dec_w   = rsa_dec;
                 end
+                rsa_start_w = 0;
             end
             S_QUERY_TX: begin
                 if (~avm_waitrequest && avm_readdata[TX_OK_BIT] == 1) begin
                     StartWrite(TX_BASE);
                     state_w = S_WRITE;
-                    bytes_counter_w = bytes_counter_w + 1;
+                    bytes_counter_w = bytes_counter_r + 1;
                     total_len_w = total_len_r + 1;
                 end else begin
                     StartRead(STATUS_BASE);
@@ -173,7 +176,7 @@ module Rsa256Wrapper (
             rsa_start_r <= 0;
             counter_r <= 0;
             total_len_r <= 0;
-        end else if (counter_r == 200000000) begin // use for auto reset
+        end else if (counter_r == 200000000) begin  // use for auto reset
             n_r <= 0;
             d_r <= 0;
             enc_r <= 0;
@@ -185,7 +188,7 @@ module Rsa256Wrapper (
             bytes_counter_r <= 0;
             rsa_start_r <= 0;
             counter_r <= 0;
-            total_len_r <= 0;   
+            total_len_r <= 0;
         end else begin
             n_r <= n_w;
             d_r <= d_w;
