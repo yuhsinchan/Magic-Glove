@@ -98,34 +98,31 @@ always_comb begin
                 state_w = S_MONT;
                 t_w = prep_result_r;
                 mont_t_start_w = 1;
+                mont_m_start_w = 1;
             end
         end
         S_MONT: begin
             // t finishes, m finishes if it starts
-            if ((mont_t_finish_r && mont_t_start_r) && (!i_d[counter_r] || (mont_m_finish_r && mont_m_start_r))) begin
-                state_w = S_CALC;
-                mont_m_start_w = 0;
-                mont_t_start_w = 0;
-                t_w = mont_t_result_r;
-                m_w = mont_m_result_r;
-            end
-            else begin
-                if (i_d[counter_r] == 1) begin
-                    mont_m_start_w = 1;
+            mont_t_start_w = 0;
+            mont_m_start_w = 0;
+            if (mont_m_finish_r && mont_t_finish_r) begin
+                if (i_d[counter_r]) begin
+                    m_w = mont_m_result_r;
                 end
-                mont_t_start_w = 1;
+                t_w = mont_t_result_r;
+                state_w = S_CALC;
             end
         end
         S_CALC: begin
             if (counter_r == 255) begin
-                m_w = m_r;
                 state_w = S_IDLE;
                 o_finished_w = 1;
             end
             else begin
                 counter_w = counter_r + 1;
                 state_w = S_MONT;
-                m_w = mont_m_result_r;
+                mont_t_start_w = 1;
+                mont_m_start_w = 1;
             end
         end
     endcase
@@ -140,7 +137,6 @@ always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
     end
     else begin
         if (i_start) begin
-            // $display("core start");
             enc_r <= i_a;
             state_r <= S_PREP;
             m_r <= 1;
@@ -187,10 +183,12 @@ assign o_finished = o_finished_r;
 assign o_prep = output_r[255:0];
 
 always_comb begin
+    o_finished_w = o_finished_r;
     case (state_r)
         S_IDLE: begin
             output_w = output_r;
             o_finished_w = 0;
+            counter_w = counter_r;
         end
         S_CALC: begin
             if (output_r >= i_n) begin
@@ -244,73 +242,67 @@ module RsaMont (
     output o_finished
 );
 
+parameter S_IDLE = 1'b0;
+parameter S_CALC = 1'b1;
 
-logic [255:0] counter_r, counter_w;
-logic [258:0] m_r, m_w;
-logic [255:0] output_r, output_w;
+logic [15:0] counter_r, counter_w;
+logic [258:0] output_r, output_w;
 logic o_finished_r, o_finished_w;
-logic started_r, started_w;
-logic next_counter_w;
+logic state_r;
 
 assign o_finished = o_finished_r;
-assign o_mont = output_r;
-assign next_counter_w = counter_r[0] ^ counter_w[0];
+assign o_mont = output_r[255:0];
 
 always_comb begin
     o_finished_w = o_finished_r;
-    started_w = started_r;
-    m_w = m_r;
-    counter_w = counter_r;
-    output_w = output_r;
-    if (!o_finished_r && started_r) begin
-        counter_w = counter_r - 1;
-        if (i_a[255 - counter_w]) begin
-            m_w = m_w + i_b;
+    case (state_r)
+        S_IDLE: begin
+            output_w = output_r;
+            o_finished_w = 0;
+            counter_w = counter_r;
         end
-        if (m_w[0] == 1) begin
-            m_w = m_w + i_n;
-        end
-        m_w = m_w >> 1;
-        // $display("counter: %d", counter_w);
-        // $display("m_w: %64x", m_w);
-        if (!counter_w) begin
-            o_finished_w = 1;
-            started_w = 0;
-            if (m_w >= i_n) begin
-                output_w = m_w - i_n;
+        S_CALC: begin
+            // $display("counter: %d", counter_r);
+            output_w = output_r;
+            if (i_a[counter_r]) begin
+                output_w = output_w + i_b;
             end
-            else begin
-                output_w = m_w;
+            if (output_w[0]) begin
+                output_w = output_w + i_n;
             end
+            output_w = output_w >> 1;
+            // $display("outpute: %64x", output_w);
+            if (counter_r >= i_bits - 1) begin
+                if (output_w >= i_n) begin
+                    output_w = output_w - i_n;
+                end
+                o_finished_w = 1;
+            end
+            counter_w = counter_r + 1;
         end
-    end
+    endcase
 end
 
-always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
+always_ff @(posedge i_clk) begin
     if (i_rst) begin
-        started_r <= 0;
         o_finished_r <= 0;
-        m_r <= 259'b0;
+        output_r <= 0;
     end
     else if (i_start) begin
-        if (!started_r) begin
-            // $display("i_a: %b", i_a);
-            m_r <= 259'b0;
-            counter_r <= i_bits;
-            started_r <= 1;
-            o_finished_r <= 0;
-        end
-        else begin
-            o_finished_r <= o_finished_w;
-            counter_r <= counter_w;
-            started_r <= started_w;
-            m_r <= m_w;
-        end
-        output_r <= output_w;
+        counter_r <= 0;
+        o_finished_r <= 0;
+        output_r <= 0;
+        state_r <= S_CALC;
     end
-    
+    else begin
+        counter_r <= counter_w;
+        output_r <= output_w;
+        o_finished_r <= o_finished_w;
+        if (o_finished_w) begin
+            state_r <= S_IDLE;
+            output_r <= output_w;
+        end
+    end
 end
 
 endmodule
-
-
