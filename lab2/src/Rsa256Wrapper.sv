@@ -24,16 +24,23 @@ module Rsa256Wrapper (
     localparam S_QUERY_TX = 3;
     localparam S_WRITE = 4;
 
+    // mode for reading and writing
+    localparam MODE_256 = 0;
+    localparam MODE_1024 = 1;
+    localparam MODE_PENDING = 2;
 
-    logic [255:0] n_r, n_w, d_r, d_w, enc_r, enc_w, dec_r, dec_w;
+
+    logic [1023:0] n_r, n_w, d_r, d_w, enc_r, enc_w, dec_r, dec_w;
     logic [2:0] state_r, state_w;
+    logic [2:0] mode_r, mode_w;
+    logic [16:0] len_r, len_w;
     logic [6:0] bytes_counter_r, bytes_counter_w;
     logic [4:0] avm_address_r, avm_address_w;
     logic avm_read_r, avm_read_w, avm_write_r, avm_write_w;
 
     logic rsa_start_r, rsa_start_w;
     logic rsa_finished;
-    logic [255:0] rsa_dec;
+    logic [1023:0] rsa_dec;
     logic [128:0] counter_r, counter_w;
     logic [6:0] total_len_r, total_len_w;
 
@@ -89,6 +96,9 @@ module Rsa256Wrapper (
         total_len_w = total_len_r;
         counter_w = counter_r + 1;
 
+        mode_w <= mode_r;
+        len_w  <= len_r;
+
         // TODO
         case (state_r)
             S_QUERY_RX: begin
@@ -106,22 +116,61 @@ module Rsa256Wrapper (
                 // read 32-byte divisor N -> 32-byte exponent D -> 32-byte enc
                 if (~avm_waitrequest) begin
                     StartRead(STATUS_BASE);
-                    if (bytes_counter_r < 33) begin
-                        state_w = S_QUERY_RX;
-                        n_w = {n_r[247:0], avm_readdata[7:0]};
-                    end else if (bytes_counter_r < 65) begin
-                        state_w = S_QUERY_RX;
-                        d_w = {d_r[247:0], avm_readdata[7:0]};
-                    end else if (bytes_counter_r < 96) begin
-                        state_w = S_QUERY_RX;
-                        enc_w   = {enc_r[247:0], avm_readdata[7:0]};
-                    end else begin
-                        state_w = S_CALC;
-                        enc_w = {enc_r[247:0], avm_readdata[7:0]};
-                        bytes_counter_w = 0;
-                        rsa_start_w = 1;
-                        avm_read_w = 0;
-                    end
+                    case (mode_r)
+                        MODE_256: begin
+                            if (bytes_counter_r < 33) begin
+                                state_w = S_QUERY_RX;
+                                n_w = {n_r[1015:0], avm_readdata[7:0]};
+                            end else if (bytes_counter_r < 65) begin
+                                state_w = S_QUERY_RX;
+                                d_w = {d_r[1015:0], avm_readdata[7:0]};
+                            end else if (bytes_counter_r < 96) begin
+                                state_w = S_QUERY_RX;
+                                enc_w   = {enc_r[1015:0], avm_readdata[7:0]};
+                            end else begin
+                                state_w = S_CALC;
+                                enc_w = {enc_r[1015:0], avm_readdata[7:0]};
+                                bytes_counter_w = 0;
+                                rsa_start_w = 1;
+                                avm_read_w = 0;
+                            end
+                        end
+
+                        MODE_1024: begin
+                            if (bytes_counter_r < 127) begin
+                                state_w = S_QUERY_RX;
+                                n_w = {n_r[1015:0], avm_readdata[7:0]};
+                            end else if (bytes_counter_r < 255) begin
+                                state_w = S_QUERY_RX;
+                                d_w = {d_r[1015:0], avm_readdata[7:0]};
+                            end else if (bytes_counter_r < 384) begin
+                                state_w = S_QUERY_RX;
+                                enc_w   = {enc_r[1015:0], avm_readdata[7:0]};
+                            end else begin
+                                state_w = S_CALC;
+                                enc_w = {enc_r[1015:0], avm_readdata[7:0]};
+                                bytes_counter_w = 0;
+                                rsa_start_w = 1;
+                                avm_read_w = 0;
+                            end
+                        end
+
+                        MODE_PENDING: begin
+                            if (bytes_counter_r < 2) begin
+                                state_w = S_QUERY_RX;
+                                len_w   = {len_r[7:0], avm_readdata[7:0]};
+                            end else begin
+                                state_w = S_QUERY_RX;
+                                if (len_w == 256) begin
+                                    mode_w = MODE_256;
+                                end else if (len_w == 1024) begin
+                                    mode_w = MODE_1024;
+                                end
+                                bytes_counter_w = 0;
+                            end
+                        end
+
+                    endcase
                 end
             end
             S_CALC: begin
@@ -147,13 +196,28 @@ module Rsa256Wrapper (
             S_WRITE: begin
                 if (~avm_waitrequest) begin
                     StartRead(STATUS_BASE);
-                    if (bytes_counter_r == 31) begin
-                        state_w = S_QUERY_RX;
-                        bytes_counter_w = 64;
-                    end else begin
-                        state_w = S_QUERY_TX;
-                        dec_w   = {dec_r[247:0], dec_r[255:248]};
-                    end
+                    case (mode_r)
+                        MODE_256: begin
+                            if (bytes_counter_r == 31) begin
+                                state_w = S_QUERY_RX;
+                                bytes_counter_w = 64;
+                            end else begin
+                                state_w = S_QUERY_TX;
+                                dec_w   = {dec_r[1015:0], dec_r[1023:1016]};
+                            end
+                        end
+
+                        MODE_1024: begin
+                            if (bytes_counter__r == 127) begin
+                                state_w = S_QUERY_RX;
+                                bytes_counter_w = 254;
+                            end else begin
+                                state_w = S_QUERY_TX;
+                                dec_w   = {dec_r[1015:0], dec_r[1023:1016]};
+                            end
+                        end
+
+                    endcase
                 end
             end
             default: begin
@@ -169,6 +233,7 @@ module Rsa256Wrapper (
             enc_r <= 0;
             dec_r <= 0;
             avm_address_r <= STATUS_BASE;
+            mode_r <= MODE_PENDING;
             avm_read_r <= 1;
             avm_write_r <= 0;
             state_r <= S_QUERY_RX;
@@ -182,6 +247,8 @@ module Rsa256Wrapper (
             enc_r <= 0;
             dec_r <= 0;
             avm_address_r <= STATUS_BASE;
+            mode_r <= MODE_PENDING;
+            len_r <= 0;
             avm_read_r <= 1;
             avm_write_r <= 0;
             state_r <= S_QUERY_RX;
