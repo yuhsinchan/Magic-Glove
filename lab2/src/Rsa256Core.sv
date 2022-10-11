@@ -2,27 +2,27 @@ module Rsa256Core (
     input          i_clk,
     input          i_rst,
     input          i_start,
-    input  [255:0] i_a, // cipher text y
-    input  [255:0] i_d, // private key
-    input  [255:0] i_n,
-    output [255:0] o_a_pow_d, // plain text x
+    input  [1023:0] i_a, // cipher text y
+    input  [1023:0] i_d, // private key
+    input  [1023:0] i_n,
+    output [1023:0] o_a_pow_d, // plain text x
     output         o_finished
 );
-parameter BITS = 16'd256; // 256
+parameter BITS = 16'd1024; // 1024
 parameter S_IDLE = 2'b00;
 parameter S_PREP = 2'b01;
 parameter S_MONT = 2'b10;
 parameter S_CALC = 2'b11;
 
-logic [255:0] n_r, n_w;
-logic [255:0] t_r, t_w;
-logic [255:0] m_r, m_w;
+logic [1023:0] n_r, n_w;
+logic [1023:0] t_r, t_w;
+logic [1023:0] m_r, m_w;
 logic [1:0] state_r, state_w;
 logic [31:0] counter_r, counter_w;
 logic prep_start_w, prep_start_r, prep_finish_r;
-logic [255:0] prep_result_r;
-logic [255:0] mont_m_result_r;
-logic [255:0] mont_t_result_r;
+logic [1023:0] prep_result_r;
+logic [1023:0] mont_m_result_r;
+logic [1023:0] mont_t_result_r;
 logic mont_t_start_w, mont_t_start_r;
 logic mont_m_start_w, mont_m_start_r;
 logic mont_t_finish_r;
@@ -30,7 +30,7 @@ logic mont_m_finish_r;
 logic mont_m_out_w;
 logic mont_t_out_w;
 logic o_finished_w, o_finished_r;
-logic [255:0] enc_r, enc_w;
+logic [1023:0] enc_r, enc_w;
 
 assign o_finished = o_finished_r;
 assign o_a_pow_d = m_r;
@@ -119,7 +119,7 @@ always_comb begin
             end
         end
         S_CALC: begin
-            if (counter_r == 255) begin
+            if (counter_r == 1023) begin
                 state_w = S_IDLE;
                 o_finished_w = 1;
             end
@@ -173,24 +173,25 @@ module RsaPrep (
     // return y * pow(2, bits, N) mod N
     input i_clk,
     input i_rst,
-    input [255:0] i_n,
-    input [255:0] i_y,
+    input [1023:0] i_n,
+    input [1023:0] i_y,
     input [15:0] i_bits,
     input i_start,
-    output [255:0] o_prep,
+    output [1023:0] o_prep,
     output o_finished
 );
 
 parameter S_IDLE = 1'b0;
 parameter S_CALC = 1'b1;
+parameter BITS = 16'd1024;
 
 logic [15:0] counter_r, counter_w;
 logic o_finished_r, o_finished_w;
-logic [258:0] output_r, output_w;
+logic [1027:0] output_r, output_w;
 logic state_r;
 
 assign o_finished = o_finished_r;
-assign o_prep = output_r[255:0];
+assign o_prep = output_r[1023:0];
 
 always_comb begin
     o_finished_w = o_finished_r;
@@ -243,25 +244,26 @@ module RsaMont (
     // return a * b * (2 ^ (-256)) mod N
     input i_clk,
     input i_rst,
-    input [255:0] i_n,
-    input [255:0] i_a,
-    input [255:0] i_b,
+    input [1023:0] i_n,
+    input [1023:0] i_a,
+    input [1023:0] i_b,
     input [15:0] i_bits,
     input i_start,
-    output [255:0] o_mont,
+    output [1023:0] o_mont,
     output o_finished
 );
 
 parameter S_IDLE = 1'b0;
 parameter S_CALC = 1'b1;
+parameter BITS = 16'd1024;
 
 logic [15:0] counter_r, counter_w;
-logic [258:0] output_r, output_w;
+logic [1027:0] output_r, output_w;
 logic o_finished_r, o_finished_w;
 logic state_r;
 
 assign o_finished = o_finished_r;
-assign o_mont = output_r[255:0];
+assign o_mont = output_r[1023:0];
 
 always_comb begin
     o_finished_w = o_finished_r;

@@ -7,7 +7,7 @@ module tb;
 	logic clk, start_cal, fin, rst;
 	initial clk = 0;
 	always #HCLK clk = ~clk;
-	logic [255:0] encrypted_data, decrypted_data;
+	logic [1023:0] encrypted_data, decrypted_data;
 	logic [247:0] golden;
 	integer fp_e, fp_d;
 
@@ -16,8 +16,8 @@ module tb;
 		.i_rst(rst),
 		.i_start(start_cal),
 		.i_a(encrypted_data),
-		.i_d(256'hB6ACE0B14720169839B15FD13326CF1A1829BEAFC37BB937BEC8802FBCF46BD9),
-		.i_n(256'hCA3586E7EA485F3B0A222A4C79F7DD12E85388ECCDEE4035940D774C029CF831),
+		.i_d(1024'hB6ACE0B14720169839B15FD13326CF1A1829BEAFC37BB937BEC8802FBCF46BD9),
+		.i_n(1024'hCA3586E7EA485F3B0A222A4C79F7DD12E85388ECCDEE4035940D774C029CF831),
 		.o_a_pow_d(decrypted_data),
 		.o_finished(fin)
 	);
@@ -53,7 +53,7 @@ module tb;
 	end
 
 	initial begin
-		#(500000*CLK)
+		#(5000000*CLK)
 		$display("Too slow, abort.");
 		$finish;
 	end
