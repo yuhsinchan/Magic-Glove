@@ -8,7 +8,7 @@ module Rsa256Core (
     output [1023:0] o_a_pow_d, // plain text x
     output         o_finished
 );
-parameter BITS = 16'd1024; // 1024
+parameter BITS = {1'b1, 256'b0}; // 1024
 parameter S_IDLE = 2'b00;
 parameter S_PREP = 2'b01;
 parameter S_MONT = 2'b10;
@@ -31,6 +31,7 @@ logic mont_m_out_w;
 logic mont_t_out_w;
 logic o_finished_w, o_finished_r;
 logic [1023:0] enc_r, enc_w;
+logic [15:0] bits_r;
 
 assign o_finished = o_finished_r;
 assign o_a_pow_d = m_r;
@@ -42,7 +43,7 @@ RsaPrep prep(
     .i_rst(i_rst),
     .i_n(n_w),
     .i_y(enc_w),
-    .i_bits(BITS),
+    .i_bits(bits_r),
     .i_start(prep_start_r),
     .o_prep(prep_result_r),
     .o_finished(prep_finish_r)
@@ -55,7 +56,7 @@ RsaMont mont1(
     .i_n(n_w),
     .i_a(m_w),
     .i_b(t_w),
-    .i_bits(BITS),
+    .i_bits(bits_r),
     .i_start(mont_m_start_r),
     .o_mont(mont_m_result_r),
     .o_finished(mont_m_finish_r)
@@ -68,7 +69,7 @@ RsaMont mont2(
     .i_n(n_w),
     .i_a(t_w),
     .i_b(t_w),
-    .i_bits(BITS),
+    .i_bits(bits_r),
     .i_start(mont_t_start_r),
     .o_mont(mont_t_result_r),
     .o_finished(mont_t_finish_r)
@@ -119,7 +120,7 @@ always_comb begin
             end
         end
         S_CALC: begin
-            if (counter_r == 1023) begin
+            if (counter_r == bits_r - 1) begin
                 state_w = S_IDLE;
                 o_finished_w = 1;
             end
@@ -141,6 +142,7 @@ always_ff @(posedge i_clk) begin
         prep_start_r <= 0;
         mont_m_start_r <= 0;
         mont_t_start_r <= 0;
+        bits_r <= 1024;
     end
     else begin
         if (i_start) begin
@@ -150,6 +152,12 @@ always_ff @(posedge i_clk) begin
             n_r <= i_n;
             counter_r <= 0;
             o_finished_r <= 0;
+            if (i_n < BITS) begin
+                bits_r <= 256;
+            end
+            else begin
+                bits_r <= 1024;
+            end
         end
         else begin
             state_r <= state_w;
@@ -183,7 +191,6 @@ module RsaPrep (
 
 parameter S_IDLE = 1'b0;
 parameter S_CALC = 1'b1;
-parameter BITS = 16'd1024;
 
 logic [15:0] counter_r, counter_w;
 logic o_finished_r, o_finished_w;
