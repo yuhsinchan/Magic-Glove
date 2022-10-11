@@ -56,7 +56,7 @@ RsaMont mont1(
     .i_a(m_w),
     .i_b(t_w),
     .i_bits(BITS),
-    .i_start(mont_m_start_w),
+    .i_start(mont_m_start_r),
     .o_mont(mont_m_result_r),
     .o_finished(mont_m_finish_r)
 );
@@ -69,7 +69,7 @@ RsaMont mont2(
     .i_a(t_w),
     .i_b(t_w),
     .i_bits(BITS),
-    .i_start(mont_t_start_w),
+    .i_start(mont_t_start_r),
     .o_mont(mont_t_result_r),
     .o_finished(mont_t_finish_r)
 );
@@ -90,6 +90,11 @@ always_comb begin
             if (i_start) begin
                 state_w = S_PREP;
                 prep_start_w = 1;
+            end
+            else begin
+                o_finished_w = 0;
+                mont_t_start_w = 0;
+                mont_m_start_w = 0;
             end
         end
         S_PREP: begin
@@ -128,12 +133,14 @@ always_comb begin
     endcase
 end
 
-always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
+always_ff @(posedge i_clk) begin
     if (i_rst) begin
         o_finished_r <= 0;
         enc_r <= 0;
-        prep_start_r <= 0;
         state_r <= S_IDLE;
+        prep_start_r <= 0;
+        mont_m_start_r <= 0;
+        mont_t_start_r <= 0;
     end
     else begin
         if (i_start) begin
@@ -151,6 +158,9 @@ always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
             n_r <= n_w;
             counter_r <= counter_w;
             o_finished_r <= o_finished_w;
+            if (o_finished_w) begin
+                state_r <= S_IDLE;
+            end
         end
         prep_start_r <= prep_start_w;
         mont_m_start_r <= mont_m_start_w;
