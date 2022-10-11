@@ -38,17 +38,19 @@ assign o_a_pow_d = m_r;
 // operations for RSA256 decryption
 // namely, the Montgomery algorithm
 RsaPrep prep(
+    .i_clk(i_clk),
     .i_rst(i_rst),
     .i_n(n_w),
     .i_y(enc_w),
     .i_bits(BITS),
-    .i_start(prep_start_w),
+    .i_start(prep_start_r),
     .o_prep(prep_result_r),
     .o_finished(prep_finish_r)
 );
 
 RsaMont mont1(
     // compute m = m * t * (2 ^ (-256)) mod N
+    .i_clk(i_clk),
     .i_rst(i_rst),
     .i_n(n_w),
     .i_a(m_w),
@@ -61,6 +63,7 @@ RsaMont mont1(
 
 RsaMont mont2(
     // compute t = (t ^ 2) * (2 ^ (-256)) mod N
+    .i_clk(i_clk),
     .i_rst(i_rst),
     .i_n(n_w),
     .i_a(t_w),
@@ -86,17 +89,16 @@ always_comb begin
         S_IDLE: begin
             if (i_start) begin
                 state_w = S_PREP;
+                prep_start_w = 1;
             end
         end
         S_PREP: begin
-            if (prep_finish_r && prep_start_r) begin
+            prep_start_w = 0;
+            if (prep_finish_r) begin
                 state_w = S_MONT;
                 t_w = prep_result_r;
-                prep_start_w = 0;
+                mont_t_start_w = 1;
             end
-            else begin
-                prep_start_w = 1;  
-            end 
         end
         S_MONT: begin
             // t finishes, m finishes if it starts
@@ -115,7 +117,6 @@ always_comb begin
             end
         end
         S_CALC: begin
-            // 255
             if (counter_r == 255) begin
                 m_w = m_r;
                 state_w = S_IDLE;
@@ -139,6 +140,7 @@ always_ff @(posedge i_start or posedge i_clk or posedge i_rst) begin
     end
     else begin
         if (i_start) begin
+            // $display("core start");
             enc_r <= i_a;
             state_r <= S_PREP;
             m_r <= 1;
@@ -163,6 +165,7 @@ endmodule
 
 module RsaPrep (
     // return y * pow(2, bits, N) mod N
+    input i_clk,
     input i_rst,
     input [255:0] i_n,
     input [255:0] i_y,
@@ -172,66 +175,65 @@ module RsaPrep (
     output o_finished
 );
 
-logic [255:0] counter_r, counter_w;
-logic [258:0] tmp_r, tmp_w;
+parameter S_IDLE = 1'b0;
+parameter S_CALC = 1'b1;
+
+logic [15:0] counter_r, counter_w;
 logic o_finished_r, o_finished_w;
-logic [255:0] output_r, output_w;
-reg started_r;
-logic started_w;
-logic next_counter_w;
-assign next_counter_w = counter_r[0] ^ counter_w[0];
+logic [258:0] output_r, output_w;
+logic state_r;
 
 assign o_finished = o_finished_r;
-assign o_prep = output_r;
+assign o_prep = output_r[255:0];
 
 always_comb begin
-    started_w = started_r;
-    o_finished_w = o_finished_r;
-    counter_w = counter_r;
-    tmp_w = tmp_r;
-    output_w = output_r;
-    if (tmp_w >= i_n) begin
-        tmp_w = tmp_w - i_n;
-    end
-    if (o_finished_r == 0 && started_r) begin
-        counter_w = counter_r - 1;
-        if (counter_w == 0) begin
-            o_finished_w = 1;
-            output_w = tmp_w;
-            started_w = 0;
+    case (state_r)
+        S_IDLE: begin
+            output_w = output_r;
+            o_finished_w = 0;
         end
-    end
+        S_CALC: begin
+            if (output_r >= i_n) begin
+                output_w = output_r - i_n;
+            end
+            else begin
+                output_w = output_r;
+            end
+            if (counter_r >= i_bits) begin
+                o_finished_w = 1;
+            end
+            counter_w = counter_r + 1;
+        end
+    endcase
 end
-always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
+always_ff @(posedge i_clk) begin
     if (i_rst) begin
-        started_r <= 0;
+        counter_r <= 0;
+        state_r <= S_IDLE;
         o_finished_r <= 0;
-        tmp_r <= 259'b0;
+        output_r <= 0;
     end
     else if (i_start) begin
+        counter_r <= 0;
+        o_finished_r <= 0;
+        output_r <= i_y;
+        state_r <= S_CALC;
+    end
+    else begin
+        counter_r <= counter_w;
+        output_r <= output_w << 1;
         o_finished_r <= o_finished_w;
-        started_r <= started_w;
-        if (started_r == 0) begin
-            counter_r <= i_bits + 1;
-            o_finished_r <= 0;
-            tmp_r <= i_y;
-            started_r <= 1;
+        if (o_finished_w) begin
+            state_r <= S_IDLE;
+            output_r <= output_w;
         end
-        else begin
-            counter_r <= counter_w;
-            tmp_r <= tmp_w << 1;
-            o_finished_r <= o_finished_w;
-        end
-        // while (tmp_r >= i_n) begin
-        //     tmp_r = tmp_r - i_n;
-        // end
-        output_r <= output_w;
     end
 end
 endmodule
 
 module RsaMont (
     // return a * b * (2 ^ (-256)) mod N
+    input i_clk,
     input i_rst,
     input [255:0] i_n,
     input [255:0] i_a,
@@ -303,13 +305,6 @@ always_ff @(posedge i_start or posedge i_rst or posedge next_counter_w) begin
             counter_r <= counter_w;
             started_r <= started_w;
             m_r <= m_w;
-            // if (i_a[256 - counter_w]) begin
-            //     m_r = m_r + i_b;
-            // end
-            // if (m_r[0] == 1) begin
-            //     m_r = m_r + i_n;
-            // end
-            // m_r = m_r >> 1;
         end
         output_r <= output_w;
     end
