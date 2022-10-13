@@ -2,6 +2,7 @@ module SevenHexDecoder_progress (
 	input              i_clk,
 	input              i_rst_n,
 	input              i_start,
+	input        [3:0] i_progress,
 	output logic [6:0] o_seven_a,
 	output logic [6:0] o_seven_b,
 	output logic [6:0] o_seven_c,
@@ -32,41 +33,30 @@ parameter DD = 7'b1111111;
 parameter Dbar = 7'b0111111;
 
 // letters
-// parameter C0 = 7'b0001001;
-// parameter C1 = 7'b0111001;
-// parameter C2 = 7'b0111111;
-
-
-// ===== Output Buffers =====
-logic o_mode_r, o_mode_w;
-assign o_mode = o_mode_r;
-
+parameter C0  = 7'b1110110;
+parameter CU  = 7'b1110111;
+parameter CD  = 7'b1111110;
+parameter CL  = 7'b1000110;
+parameter CLU = 7'b1000111;
+parameter CLD = 7'b1001110;
+parameter CR  = 7'b1110000;
+parameter CRU = 7'b1110001;
+parameter CRD = 7'b1111000;
 
 // ===== Combinational Circuits =====
 always_comb begin
-	o_mode_w = o_mode_r;
-	if (i_start) begin
-        o_mode_w = 1'h1 - o_mode_r;
-    end
-
-	case(o_mode_r)
-		1'h0: begin o_seven_a = DD; o_seven_b = D2;	o_seven_c = D5; o_seven_d = D6; end
-		1'h1: begin o_seven_a = D1; o_seven_b = D0;	o_seven_c = D2; o_seven_d = D4; end	
+	case(i_progress)
+		4'h0: begin o_seven_a = CL;  o_seven_b = C0;	o_seven_c = C0; o_seven_d = CR; end
+		4'h1: begin o_seven_a = CLU; o_seven_b = C0;	o_seven_c = C0; o_seven_d = CR; end
+		4'h2: begin o_seven_a = CL;  o_seven_b = CU;	o_seven_c = C0; o_seven_d = CR; end
+		4'h3: begin o_seven_a = CL;  o_seven_b = C0;	o_seven_c = CU; o_seven_d = CR; end
+		4'h4: begin o_seven_a = CL;  o_seven_b = C0;	o_seven_c = C0; o_seven_d = CRU; end
+		4'h5: begin o_seven_a = CL;  o_seven_b = C0;	o_seven_c = C0; o_seven_d = CRD; end
+		4'h6: begin o_seven_a = CL;  o_seven_b = C0;	o_seven_c = CD; o_seven_d = CR; end
+		4'h7: begin o_seven_a = CL;  o_seven_b = CD;	o_seven_c = C0; o_seven_d = CR; end
+		4'h8: begin o_seven_a = CLD; o_seven_b = C0;	o_seven_c = C0; o_seven_d = CR; end
 		default begin o_seven_a = Dbar; o_seven_b = Dbar; o_seven_c = Dbar; o_seven_d = Dbar; end	
 	endcase
-
-end
-
-
-// ===== Sequential Circuits =====
-always_ff @(posedge i_clk or negedge i_rst_n) begin
-// reset
-if (!i_rst_n) begin
-	o_mode_r <= 1'h0;
-
-end else begin
-	o_mode_r <= o_mode_w;
-end
 end
 
 endmodule
