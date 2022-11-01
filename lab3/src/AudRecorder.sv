@@ -62,15 +62,16 @@ module AudRecorder (
                 end
             end
             S_DONE: begin
+                data_w = rec_data_r;
                 if (i_stop) begin
                     address_w = 0;
                     state_w   = S_IDLE;
                 end else if (i_pause) begin
-                    start_w = S_IDLE;
-                end else begin
-                    data_w = rec_data_r;
                     address_w = address_r + 1;
-                    state_w = S_PREP;
+                    state_w   = S_IDLE;
+                end else begin
+                    address_w = address_r + 1;
+                    state_w   = S_PREP;
                 end
             end
         endcase
@@ -85,9 +86,9 @@ module AudRecorder (
             counter_r <= 5'b0;
         end else begin
             state_r <= state_w;
-            address_r <= address_r;
+            address_r <= address_w;
             rec_data_r <= rec_data_w;
-            data_r <= data_r;
+            data_r <= data_w;
             counter_r <= counter_w;
         end
     end

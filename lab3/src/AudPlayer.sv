@@ -24,6 +24,7 @@ module AudPlayer (
         state_w = state_r;
         dac_data_w = dac_data_r;
         aud_data_w = aud_data_r;
+        counter_w = counter_r;
 
         case (state_r)
             S_IDLE: begin
@@ -42,7 +43,10 @@ module AudPlayer (
                 end
             end
             S_WAIT: begin
-                if (!i_bclk) begin
+                if (!i_daclrck) begin
+                    dac_data_w = i_dac_data << 1;
+                    aud_data_w = i_dac_data[15];
+                    counter_w = counter_r + 1;
                     state_w = S_PLAY;
                 end
             end
@@ -55,6 +59,8 @@ module AudPlayer (
                 counter_w  = counter_r + 1;
             end
             S_DONE: begin
+                aud_data_w = 0;
+                counter_w  = 0;
                 if (i_en) begin
                     state_w = S_PREP;
                 end else begin
@@ -65,7 +71,7 @@ module AudPlayer (
     end
 
 
-    always_ff @(posedge i_bclk or negedge i_rst_n) begin
+    always_ff @(negedge i_bclk or negedge i_rst_n) begin
         if (!i_rst_n) begin
             state_r <= S_IDLE;
             dac_data_r <= 16'b0;
