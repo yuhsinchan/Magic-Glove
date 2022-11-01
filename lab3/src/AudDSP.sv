@@ -36,6 +36,7 @@ module AudDSP (
 
     assign o_dac_data = dac_data_r;
     assign o_sram_addr = sram_addr_r;
+    assign o_sram_addr = sram_addr_r;
 
 
     always_comb begin
@@ -78,12 +79,12 @@ module AudDSP (
                     case (speed_state_r)
                         SP_NORMAL: begin
                             dac_data_w = $signed(i_sram_data);
-                            addr_counter_w = addr_counter_r + 19'd1; 
+                            sram_addr_w = sram_addr_r + 19'd1; 
                         end
                         SP_FAST: begin
                             // down sampling
                             dac_data_w = $signed(i_sram_data);
-                            addr_counter_w = addr_counter_r + {17'b0, (i_speed + 3'd1)}; 
+                            sram_addr_w = sram_addr_r + {17'b0, (i_speed + 3'd1)}; 
                         end
                         SP_SLOW0: begin
                             // up sampling: piecewise-constant interpolation
@@ -91,7 +92,7 @@ module AudDSP (
                             dac_data_w = $signed(pre_dac_data_r);
                             if (sampling_counter_r = i_speed) begin
                                 sampling_counter_w = 3'd0;
-                                addr_counter_w = addr_counter_r + 19'd1;
+                                sram_addr_w = sram_addr_r + 19'd1;
                             end
                         end
                         SP_SLOW1: begin
@@ -128,7 +129,7 @@ module AudDSP (
             sampling_counter_r <= 0;
             dac_data_r <= 0;
             pre_dac_data_r <= 0;
-            sram_addr_r <= 0;
+            sram_addr_r <= 1;
         end else begin
             state_r <= state_w;
             speed_state_r <= speed_state_w;
