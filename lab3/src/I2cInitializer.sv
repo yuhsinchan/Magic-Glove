@@ -43,8 +43,8 @@ module I2cInitializer (
         .i_start(start_r),
         .i_data(data_r),
         .o_finished(finished),
-        .o_scl(scl),
-        .o_sda(sda),
+        .o_sclk(scl),
+        .o_sdat(sda),
         .o_ack(ack)
     );
 
@@ -71,14 +71,16 @@ module I2cInitializer (
                     if (counter_r == data_num) begin
                         state_w = S_DONE;
                     end else begin
+                        start_w = 1'b1;
                         state_w = S_NEXT;
                     end
                 end
             end
             S_NEXT: begin
                 counter_w = counter_r + 1;
-                data_w = setup_data[(counter_r+1)*24-1:counter_r*24];
-                start_w = 1'b1;
+                data_w = setup_data[(counter_r+1)*24-1-:24];
+                start_w = 1'b0;
+                state_w = S_PROC;
             end
             S_DONE: begin
                 finished_w = 1'b1;
@@ -128,7 +130,6 @@ module I2C (
     logic [3:0] state_r, state_w;
     logic [3:0] counter_r, counter_w;
     logic [4:0] left_r, left_w;
-    logic ack_r, ack_w;
     logic finished_r, finished_w;
 
     logic sda_r, sda_w;
@@ -146,6 +147,8 @@ module I2C (
         state_w = state_r;
         counter_w = counter_r;
         ack_w = ack_r;
+        left_w = left_r;
+        finished_w = finished_r;
 
         case (state_r)
             S_INIT: begin
@@ -159,18 +162,19 @@ module I2C (
                     scl_w  = 1'b1;
                     data_w = data_r << 1;
                     left_w = left_r - 1;
-                end else if (counter_r == 7) begin
+                end else if (counter_r == 8) begin
                     sda_w = 1'bZ;
                     scl_w = 1'b0;
                     state_w = S_ACK;
                     counter_w = 3'b0;
                     ack_w = 1'b1;
                 end else if (left_r > 0) begin
-                    sda_w = data_r[0];
+                    sda_w = data_r[23];
                     scl_w = 1'b0;
                     counter_w = counter_r + 1;
                     ack_w = 1'b0;
                 end else begin
+                    scl_w   = 1'b0;
                     sda_w   = 1'b0;
                     ack_w   = 1'b0;
                     state_w = S_COMPLETE;
