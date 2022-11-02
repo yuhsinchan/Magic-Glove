@@ -10,9 +10,11 @@ module AudDSP (
     input          i_slow_1,  // linear interpolation
     input          i_daclrck, // 0 for left channel, 1 for right channel
     input  [15:0]  i_sram_data,
+    input  [19:0]  i_end_addr,
 
     output [15:0]  o_dac_data,
-    output [19:0]  o_sram_addr
+    output [19:0]  o_sram_addr,
+    output         o_finished
 );
 
     localparam IDLE  = 0; // stop  will reset the state to IDLE
@@ -24,6 +26,9 @@ module AudDSP (
     localparam SP_FAST   = 1;
     localparam SP_SLOW0  = 2;
     localparam SP_SLOW1  = 3;
+
+    logic finished_w, finished_r;
+    assign o_finished = finished_r;
 
     logic [1:0] state_w, state_r;
     logic [1:0] speed_state_w, speed_state_r;
@@ -50,6 +55,7 @@ module AudDSP (
         pre_dac_data_w     = pre_dac_data_r;
         sram_addr_w        = sram_addr_r;
         daclrck_w          = daclrck_r;
+        finished_w         = finished_r;
         
         daclrck_w = i_daclrck;
         if (i_fast) begin
@@ -67,61 +73,74 @@ module AudDSP (
         
         case (state_r)         
             IDLE: begin
+                finished_w = 1'b0;
                 if (i_start) begin
                     state_w = WAIT;
                 end
             end
             PLAY: begin
                 // $display("PLAY");
-                if (i_stop) begin
+                case (speed_state_r)
+                    SP_NORMAL: begin
+                        // $display("Normal");
+                        dac_data_w = $signed(i_sram_data);
+                        sram_addr_w = sram_addr_r + 20'b1; 
+                    end
+                    SP_FAST: begin
+                        // $display("Fast");
+                        // down sampling
+                        dac_data_w = $signed(i_sram_data);
+                        if (i_speed <= 3'd6) begin
+                            sram_addr_w = sram_addr_r + {17'b0, (i_speed + 3'b1)};
+                        end else begin
+                            sram_addr_w = sram_addr_r + {16'b0, 4'b1000};
+                        end
+
+                    end
+                    SP_SLOW0: begin
+                        // $display("Slow0");
+                        // up sampling: piecewise-constant interpolation
+                        dac_data_w = $signed(pre_dac_data_r);
+                        sampling_counter_w = sampling_counter_r + 3'b1;
+                        if (sampling_counter_r == i_speed) begin
+                            sampling_counter_w = 3'b0;
+                            sram_addr_w = sram_addr_r + 20'b1;
+                            pre_dac_data_w = $signed(i_sram_data);
+                        end
+                    end
+                    SP_SLOW1: begin
+                        // $display("Slow1");
+                        // up sampling: linear interpolation
+                        dac_data_w = $signed( $signed(i_sram_data - pre_dac_data_r) * $signed({13'b0, sampling_counter_r}) / $signed({12'b0, i_speed} + 15'b1) ) + $signed(pre_dac_data_r);
+                        sampling_counter_w = sampling_counter_r + 3'b1;
+                        if (sampling_counter_r == i_speed) begin
+                            sampling_counter_w = 3'b0;
+                            sram_addr_w = sram_addr_r + 20'b1;
+                            pre_dac_data_w = $signed(i_sram_data);
+                        end
+                    end
+                endcase
+
+                if (sram_addr_r >= i_end_addr) begin
                     state_w = IDLE;
+                    sram_addr_w = 20'b1;
+                    finished_w = 1'b1;
+                end
+                else if (i_stop) begin
+                    state_w = IDLE;
+                    sram_addr_w = 20'b1;
                 end
                 else if (i_pause) begin
                     state_w = PAUSE;
+                end else begin
+                    state_w = WAIT;
                 end
-                else begin
-                    case (speed_state_r)
-                        SP_NORMAL: begin
-                            // $display("Normal");
-                            dac_data_w = $signed(i_sram_data);
-                            sram_addr_w = sram_addr_r + 20'b1; 
-                        end
-                        SP_FAST: begin
-                            // $display("Fast");
-                            // down sampling
-                            dac_data_w = $signed(i_sram_data);
-                            sram_addr_w = sram_addr_r + {17'b0, (i_speed + 3'b1)}; 
-                        end
-                        SP_SLOW0: begin
-                            // $display("Slow0");
-                            // up sampling: piecewise-constant interpolation
-                            dac_data_w = $signed(pre_dac_data_r);
-                            sampling_counter_w = sampling_counter_r + 3'b1;
-                            if (sampling_counter_r == i_speed) begin
-                                sampling_counter_w = 3'b0;
-                                sram_addr_w = sram_addr_r + 20'b1;
-                                pre_dac_data_w = $signed(i_sram_data);
-                            end
-                        end
-                        SP_SLOW1: begin
-                            // $display("Slow1");
-                            // up sampling: linear interpolation
-                            dac_data_w = $signed( $signed(i_sram_data - pre_dac_data_r) * $signed({13'b0, sampling_counter_r}) / $signed({12'b0, i_speed} + 15'b1) ) + $signed(pre_dac_data_r);
-                            sampling_counter_w = sampling_counter_r + 3'b1;
-                            if (sampling_counter_r == i_speed) begin
-                                sampling_counter_w = 3'b0;
-                                sram_addr_w = sram_addr_r + 20'b1;
-                                pre_dac_data_w = $signed(i_sram_data);
-                            end
-                        end
-                    endcase
-                end
-                state_w = WAIT;
             end
             PAUSE: begin    
                 dac_data_w = 16'b0;
                 if (i_stop) begin
                     state_w = IDLE;
+                    sram_addr_w = 20'b1;
                 end
                 else if (i_start) begin
                     state_w = PLAY;
@@ -147,8 +166,9 @@ module AudDSP (
             sampling_counter_r <= 3'b0;
             dac_data_r         <= 16'b0;
             pre_dac_data_r     <= 16'b0;
-            sram_addr_r        <= 20'b0;
+            sram_addr_r        <= 20'b1;
             daclrck_r 	       <= i_daclrck;
+            finished_r         <= 1'b0;
         end else begin
             state_r            <= state_w;
             speed_state_r      <= speed_state_w;
@@ -157,6 +177,7 @@ module AudDSP (
             pre_dac_data_r     <= pre_dac_data_w;
             sram_addr_r        <= sram_addr_w;
             daclrck_r   	   <= daclrck_w;
+            finished_r         <= finished_w;
         end
     end
 

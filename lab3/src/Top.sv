@@ -28,7 +28,10 @@ module Top (
     inout  i_AUD_ADCLRCK,
     inout  i_AUD_BCLK,
     inout  i_AUD_DACLRCK,
-    output o_AUD_DACDAT
+    output o_AUD_DACDAT,
+    output [2:0] o_state,
+    output [5:0] o_rec_time,
+    output [3:0] o_progress
 
     // SEVENDECODER (optional display)
     // output [5:0] o_record_time,
@@ -58,9 +61,11 @@ module Top (
 
     logic i2c_oen, i2c_sdat;
     logic [19:0] addr_record, addr_play;
+    logic [19:0] addr_end_r, addr_end_w;
     logic [15:0] data_record, data_play, dac_data;
 
-    logic state_r, state_w;
+    logic [2:0] state_r, state_w;
+    assign o_state = state_r;
 
     // for i2c
     logic i2c_start_r, i2c_start_w;
@@ -69,18 +74,28 @@ module Top (
     // for record
     logic rec_start_r, rec_start_w, rec_pause, rec_stop;
 
+    // for output record time
+    logic [5:0]  rec_time_r, rec_time_w;
+    logic [23:0] rec_counter_r, rec_counter_w;
+
     assign rec_pause = (state_r == S_RECD_PAUSE) ? 1'b1 : 1'b0;
     assign rec_stop  = (state_r == S_IDLE) ? 1'b1 : 1'b0;
+    assign o_rec_time = rec_time_r;
 
     // for play
     logic play_start_r, play_start_w, play_pause, play_stop, enable;
     logic mode_0, mode_1;
+    logic dsp_finished;
 
     assign enable = (state_r == S_PLAY) ? 1'b1 : 1'b0;
     assign play_pause = (state_r == S_PLAY_PAUSE) ? 1'b1 : 1'b0;
     assign play_stop = (state_r == S_IDLE) ? 1'b1 : 1'b0;
     assign mode_0 = ((i_slow_mode == 0) ? 1'b1 : 1'b0) & (!i_play_mode);
     assign mode_1 = ((i_slow_mode == 1) ? 1'b1 : 1'b0) & (!i_play_mode);
+
+    // for progress
+    logic [3:0] progress_r, progress_w;
+    assign o_progress = progress_r;
 
 
     assign io_I2C_SDAT = (i2c_oen) ? i2c_sdat : 1'bz;
@@ -125,8 +140,10 @@ module Top (
         .i_slow_1(mode_1),  // linear interpolation
         .i_daclrck(i_AUD_DACLRCK),
         .i_sram_data(data_play),
+        .i_end_addr(addr_end_r),
         .o_dac_data(dac_data),
-        .o_sram_addr(addr_play)
+        .o_sram_addr(addr_play),
+        .o_finished(dsp_finished)
     );
 
     // === AudPlayer ===
@@ -158,11 +175,17 @@ module Top (
         // design your control here
         state_w = state_r;
         i2c_start_w = i2c_start_r;
+        rec_time_w = rec_time_r;
+        rec_counter_w = rec_counter_r;
         rec_start_w = rec_start_r;
         play_start_w = play_start_r;
+        progress_w = progress_r;
+        addr_end_w = addr_end_r;
 
         case (state_r)
             S_IDLE: begin
+                rec_counter_w = 24'd0;
+                rec_time_w = 6'b0;
                 if (i_mode == 1 & i_key_0 == 1) begin
                     state_w = S_PLAY;
                     play_start_w = 1'b1;
@@ -173,17 +196,23 @@ module Top (
             end
 
             S_I2C: begin
-                i2c_start_w = 1'b0;
                 if (i2c_finished) begin
+                    i2c_start_w = 1'b0;
                     state_w = S_IDLE;
                 end
             end
 
             S_RECD: begin
+                rec_counter_w = rec_counter_r + 24'd1;
+                if (rec_counter_r == 24'd12000000) begin
+                    rec_counter_w = 24'b0;
+                    rec_time_w = rec_time_r + 6'b1;
+                end
                 rec_start_w = 1'b0;
                 if (i_key_1 == 1) begin
                     state_w = S_RECD_PAUSE;
                 end else if (i_key_2 == 1) begin
+                    addr_end_w = addr_record;
                     state_w = S_IDLE;
                 end
             end
@@ -193,12 +222,22 @@ module Top (
                     state_w = S_RECD;
                     rec_start_w = 1'b1;
                 end else if (i_key_2 == 1) begin
+                    addr_end_w = addr_record;
                     state_w = S_IDLE;
                 end
             end
 
             S_PLAY: begin
+                rec_counter_w = rec_counter_r + 24'd1;
+                if (rec_counter_r == 24'd12000000) begin
+                    rec_counter_w = 24'b0;
+                    rec_time_w = rec_time_r + 6'b1;
+                end
                 play_start_w = 1'b0;
+                if (dsp_finished) begin
+                    state_w = S_IDLE;
+                end
+
                 if (i_key_1 == 1) begin
                     state_w = S_PLAY_PAUSE;
                 end else if (i_key_2 == 1) begin
@@ -215,6 +254,27 @@ module Top (
                 end
             end
         endcase
+
+        if (rec_counter_r <= 24'd0) begin
+            progress_w = 0;
+        end else if (rec_counter_r <= 24'd1500000) begin
+            progress_w = 1; 
+        end else if (rec_counter_r <= 24'd3000000) begin
+            progress_w = 2; 
+        end else if (rec_counter_r <= 24'd4500000) begin
+            progress_w = 3; 
+        end else if (rec_counter_r <= 24'd5000000) begin
+            progress_w = 4; 
+        end else if (rec_counter_r <= 24'd7500000) begin
+            progress_w = 5; 
+        end else if (rec_counter_r <= 24'd9000000) begin
+            progress_w = 6; 
+        end else if (rec_counter_r <= 24'd10500000) begin
+            progress_w = 7; 
+        end else if (rec_counter_r <= 24'd12000000) begin
+            progress_w = 8;
+        end
+
     end
 
     always_ff @(posedge i_AUD_BCLK or negedge i_rst_n) begin
@@ -223,11 +283,19 @@ module Top (
             i2c_start_r <= 1'b1;
             rec_start_r <= 1'b0;
             play_start_r <= 1'b0;
+            rec_time_r <= 6'b0;
+            rec_counter_r <= 24'b0;
+            progress_r <= 4'b0;
+            addr_end_r <= 20'b0;
         end else begin
             state_r <= state_w;
             i2c_start_r <= i2c_start_w;
             rec_start_r <= rec_start_w;
             play_start_r <= play_start_w;
+            rec_time_r <= rec_time_w;
+            rec_counter_r <= rec_counter_w;
+            progress_r <= progress_w;
+            addr_end_r <= addr_end_w;
         end
     end
 

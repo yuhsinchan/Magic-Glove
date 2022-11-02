@@ -18,11 +18,8 @@ module AudRecorder (
 
     logic [2:0] state_r, state_w;
     logic [19:0] address_r, address_w;
-    logic [15:0] rec_data_r, rec_data_w;
     logic [15:0] data_r, data_w;
-    logic [4:0] counter_r, counter_w;
-
-    logic start_rec;
+    logic [3:0] counter_r, counter_w;
 
     assign o_address = address_r;
     assign o_data = data_r;
@@ -30,20 +27,22 @@ module AudRecorder (
     always_comb begin
         state_w = state_r;
         address_w = address_r;
-        rec_data_w = rec_data_r;
         data_w = data_r;
         counter_w = counter_r;
 
         case (state_r)
             S_IDLE: begin
-                counter_w = 0;
+                counter_w = 4'b0;
                 if (i_start) begin
-                    if (!i_lrc) begin
-                        state_w = S_PREP;
-                    end
+					state_w = S_PREP;
                 end
+
+				if (i_stop) begin
+					address_w = 20'b0;
+				end
             end
             S_PREP: begin
+				data_w = 16'b0;
                 if (i_lrc) begin
                     state_w = S_WAIT;
                 end
@@ -54,24 +53,22 @@ module AudRecorder (
                 end
             end
             S_RECD: begin
-                if (counter_r < 16) begin
-                    rec_data_w = {rec_data_r[14:0], i_data};
-                    counter_w  = counter_r + 1;
-                end else begin
+				data_w = {data_r[14:0], i_data};
+				counter_w = counter_r + 1;
+            	if (counter_r == 15) begin
                     state_w = S_DONE;
                 end
             end
             S_DONE: begin
-                data_w = rec_data_r;
+				counter_w = 4'b0;
+				address_w = address_r + 1'b1;
+				state_w   = S_PREP;
                 if (i_stop) begin
                     address_w = 0;
                     state_w   = S_IDLE;
-                end else if (i_pause) begin
-                    address_w = address_r + 1;
+                end 
+				if (i_pause) begin
                     state_w   = S_IDLE;
-                end else begin
-                    address_w = address_r + 1;
-                    state_w   = S_PREP;
                 end
             end
         endcase
@@ -81,13 +78,11 @@ module AudRecorder (
         if (!i_rst_n) begin
             state_r <= S_IDLE;
             address_r <= 20'b0;
-            rec_data_r <= 16'b0;
             data_r <= 16'b0;
             counter_r <= 5'b0;
         end else begin
             state_r <= state_w;
             address_r <= address_w;
-            rec_data_r <= rec_data_w;
             data_r <= data_w;
             counter_r <= counter_w;
         end

@@ -9,63 +9,40 @@ module AudPlayer (
 
     parameter S_IDLE = 0;
     parameter S_PREP = 1;
-    parameter S_WAIT = 2;
-    parameter S_PLAY = 3;
-    parameter S_DONE = 4;
+    parameter S_PLAY = 2;
 
-    logic [3:0] state_r, state_w;
-    logic [5:0] counter_r, counter_w;
+    logic [1:0] state_r, state_w;
+    logic [3:0] counter_r, counter_w;
     logic [15:0] dac_data_r, dac_data_w;
-    logic aud_data_r, aud_data_w;
+	logic lrc_r, lrc_w;
 
-    assign o_aud_dacdat = aud_data_r;
+    assign o_aud_dacdat = dac_data_r[15];
 
     always_comb begin
         state_w = state_r;
         dac_data_w = dac_data_r;
-        aud_data_w = aud_data_r;
         counter_w = counter_r;
+		lrc_w = i_daclrck;
 
         case (state_r)
             S_IDLE: begin
-                counter_w = 0;
+                counter_w = 4'b0;
                 if (i_en) begin
-                    if (!i_daclrck) begin
-                        state_w = S_PREP;
-                    end else begin
-                        state_w = S_WAIT;
-                    end
+					state_w = S_PREP;
                 end
             end
             S_PREP: begin
-                if (i_daclrck) begin
-                    state_w = S_WAIT;
-                end
-            end
-            S_WAIT: begin
-                if (!i_daclrck) begin
-                    dac_data_w = i_dac_data << 1;
-                    aud_data_w = i_dac_data[15];
-                    counter_w = counter_r + 1;
+                if (lrc_r != lrc_w) begin
+					dac_data_w = i_dac_data;
                     state_w = S_PLAY;
                 end
             end
             S_PLAY: begin
                 if (counter_r == 15) begin
-                    state_w = S_DONE;
-                end
-                aud_data_w = dac_data_r[15];
-                dac_data_w = dac_data_r << 1;
-                counter_w  = counter_r + 1;
-            end
-            S_DONE: begin
-                aud_data_w = 0;
-                counter_w  = 0;
-                if (i_en) begin
-                    state_w = S_PREP;
-                end else begin
                     state_w = S_IDLE;
                 end
+				dac_data_w = dac_data_r << 1;
+                counter_w = counter_r + 1'b1;
             end
         endcase
     end
@@ -75,15 +52,13 @@ module AudPlayer (
         if (!i_rst_n) begin
             state_r <= S_IDLE;
             dac_data_r <= 16'b0;
-            aud_data_r <= 1'b0;
-            counter_r <= 5'b0;
+            counter_r <= 3'b0;
+			lrc_r <= i_daclrck;
         end else begin
             state_r <= state_w;
             dac_data_r <= dac_data_w;
-            aud_data_r <= aud_data_w;
             counter_r <= counter_w;
+			lrc_r <= lrc_w;
         end
     end
-
-
 endmodule
