@@ -6,7 +6,7 @@ module I2cInitializer (
     output o_sclk,
     output o_sdat,
     output o_oen,  // you are outputing (you are not outputing only when you are "ack"ing.)
-	output [1:0] o_state
+    output [1:0] o_state
 );
     localparam data_num = 7;
     // localparam [23:0] setup_data[6:0] = '{
@@ -48,7 +48,7 @@ module I2cInitializer (
     assign o_sdat = sda;
     assign o_oen = !ack;
     assign o_finished = finished_r;
-	assign o_state = state_r;
+    assign o_state = state_r;
 
     I2C i2c (
         .i_clk(i_clk),

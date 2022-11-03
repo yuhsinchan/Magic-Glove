@@ -24,10 +24,10 @@ module Top (
     inout  io_I2C_SDAT,
 
     // AudPlayer
-    input  i_AUD_ADCDAT,
-    inout  i_AUD_ADCLRCK,
-    inout  i_AUD_BCLK,
-    inout  i_AUD_DACLRCK,
+    input i_AUD_ADCDAT,
+    inout i_AUD_ADCLRCK,
+    inout i_AUD_BCLK,
+    inout i_AUD_DACLRCK,
     output o_AUD_DACDAT,
     output [2:0] o_state,
     output [5:0] o_rec_time,
@@ -75,11 +75,11 @@ module Top (
     logic rec_start_r, rec_start_w, rec_pause, rec_stop;
 
     // for output record time
-    logic [5:0]  rec_time_r, rec_time_w;
+    logic [5:0] rec_time_r, rec_time_w;
     logic [23:0] rec_counter_r, rec_counter_w;
 
-    assign rec_pause = (state_r == S_RECD_PAUSE) ? 1'b1 : 1'b0;
-    assign rec_stop  = (state_r == S_IDLE) ? 1'b1 : 1'b0;
+    assign rec_pause  = (state_r == S_RECD_PAUSE) ? 1'b1 : 1'b0;
+    assign rec_stop   = (state_r == S_IDLE) ? 1'b1 : 1'b0;
     assign o_rec_time = rec_time_r;
 
     // for play
@@ -95,14 +95,14 @@ module Top (
 
     // for progress
     logic [3:0] progress_r, progress_w;
-    assign o_progress = progress_r;
+    assign o_progress  = progress_r;
 
 
     assign io_I2C_SDAT = (i2c_oen) ? i2c_sdat : 1'bz;
 
     assign o_SRAM_ADDR = (state_r == S_RECD) ? addr_record : addr_play[19:0];
-    assign io_SRAM_DQ = (state_r == S_RECD) ? data_record : 16'dz;  // sram_dq as output
-    assign data_play = (state_r != S_RECD) ? io_SRAM_DQ : 16'd0;  // sram_dq as input
+    assign io_SRAM_DQ  = (state_r == S_RECD) ? data_record : 16'dz;  // sram_dq as output
+    assign data_play   = (state_r != S_RECD) ? io_SRAM_DQ : 16'd0;  // sram_dq as input
 
     assign o_SRAM_WE_N = (state_r == S_RECD) ? 1'b0 : 1'b1;
     assign o_SRAM_CE_N = 1'b0;
@@ -258,19 +258,19 @@ module Top (
         if (rec_counter_r <= 24'd0) begin
             progress_w = 0;
         end else if (rec_counter_r <= 24'd1500000) begin
-            progress_w = 1; 
+            progress_w = 1;
         end else if (rec_counter_r <= 24'd3000000) begin
-            progress_w = 2; 
+            progress_w = 2;
         end else if (rec_counter_r <= 24'd4500000) begin
-            progress_w = 3; 
+            progress_w = 3;
         end else if (rec_counter_r <= 24'd5000000) begin
-            progress_w = 4; 
+            progress_w = 4;
         end else if (rec_counter_r <= 24'd7500000) begin
-            progress_w = 5; 
+            progress_w = 5;
         end else if (rec_counter_r <= 24'd9000000) begin
-            progress_w = 6; 
+            progress_w = 6;
         end else if (rec_counter_r <= 24'd10500000) begin
-            progress_w = 7; 
+            progress_w = 7;
         end else if (rec_counter_r <= 24'd12000000) begin
             progress_w = 8;
         end

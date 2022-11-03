@@ -34,15 +34,15 @@ module AudRecorder (
             S_IDLE: begin
                 counter_w = 4'b0;
                 if (i_start) begin
-					state_w = S_PREP;
+                    state_w = S_PREP;
                 end
 
-				if (i_stop) begin
-					address_w = 20'b0;
-				end
+                if (i_stop) begin
+                    address_w = 20'b0;
+                end
             end
             S_PREP: begin
-				data_w = 16'b0;
+                data_w = 16'b0;
                 if (i_lrc) begin
                     state_w = S_WAIT;
                 end
@@ -53,22 +53,22 @@ module AudRecorder (
                 end
             end
             S_RECD: begin
-				data_w = {data_r[14:0], i_data};
-				counter_w = counter_r + 1;
-            	if (counter_r == 15) begin
+                data_w = {data_r[14:0], i_data};
+                counter_w = counter_r + 1;
+                if (counter_r == 15) begin
                     state_w = S_DONE;
                 end
             end
             S_DONE: begin
-				counter_w = 4'b0;
-				address_w = address_r + 1'b1;
-				state_w   = S_PREP;
+                counter_w = 4'b0;
+                address_w = address_r + 1'b1;
+                state_w   = S_PREP;
                 if (i_stop) begin
                     address_w = 0;
                     state_w   = S_IDLE;
-                end 
-				if (i_pause) begin
-                    state_w   = S_IDLE;
+                end
+                if (i_pause) begin
+                    state_w = S_IDLE;
                 end
             end
         endcase

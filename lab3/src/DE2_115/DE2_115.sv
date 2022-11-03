@@ -144,7 +144,7 @@ module DE2_115 (
 
     assign AUD_XCK = CLK_12M;
 
-    agua pll0( // generate with qsys, please follow lab2 tutorials
+    agua pll0 (  // generate with qsys, please follow lab2 tutorials
         .clk_clk(CLOCK_50),
         .reset_reset_n(key3down),
         .altpll_0_c0_clk(CLK_12M),
@@ -226,27 +226,27 @@ module DE2_115 (
         // .o_ledr(LEDR) // [17:0]
     );
 
-    SevenHexDecoder seven_dec0( // mode
-    	.i_hex(state),
-    	.o_seven_ten(HEX7),
-    	.o_seven_one(HEX6)
+    SevenHexDecoder seven_dec0 (  // mode
+        .i_hex(state),
+        .o_seven_ten(HEX7),
+        .o_seven_one(HEX6)
     );
 
-    SevenHexDecoder seven_dec1( // play mode
-    	.i_hex(rec_time),
-    	.o_seven_ten(HEX5),
-    	.o_seven_one(HEX4)
+    SevenHexDecoder seven_dec1 (  // play mode
+        .i_hex(rec_time),
+        .o_seven_ten(HEX5),
+        .o_seven_one(HEX4)
     );
 
-    SevenHexDecoder_progress seven_dec3(
-	.i_clk(CLOCK_50),
-	.i_rst_n(KEY[0]),
-	.i_progress(progress),
-	.o_seven_a(HEX3),
-	.o_seven_b(HEX2),
-	.o_seven_c(HEX1),
-	.o_seven_d(HEX0)
-);
+    SevenHexDecoder_progress seven_dec3 (
+        .i_clk(CLOCK_50),
+        .i_rst_n(KEY[0]),
+        .i_progress(progress),
+        .o_seven_a(HEX3),
+        .o_seven_b(HEX2),
+        .o_seven_c(HEX1),
+        .o_seven_d(HEX0)
+    );
 
     // comment those are use for display
     // assign HEX0 = '1;
