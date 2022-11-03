@@ -248,7 +248,7 @@ module Top (
             S_PLAY_PAUSE: begin
                 if (i_key_0 == 1) begin
                     state_w = S_PLAY;
-                    rec_start_w = 1'b1;
+                    play_start_w = 1'b1;
                 end else if (i_key_2 == 1) begin
                     state_w = S_IDLE;
                 end
