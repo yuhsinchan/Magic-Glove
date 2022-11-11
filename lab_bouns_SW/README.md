@@ -14,7 +14,7 @@ The roadmap of this lab:
 > When you design an architecture, you design the dataflow first.
 > Write Verilog only after you have make sure of all dataflow.
 
-We intdoruce two very common but simple protocol dataflow.
+We introduce two very common but simple protocol dataflow.
 The one wire protocol is quite simple: if "sender" set the val (valid signal)
 to high, then the "sender" has prepared a valid data at that cycle.
 

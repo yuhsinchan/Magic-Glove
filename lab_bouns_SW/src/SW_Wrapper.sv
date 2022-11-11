@@ -31,24 +31,52 @@ localparam TX_OK_BIT   = 6;
 localparam RX_OK_BIT   = 7;
 
 // Feel free to design your own FSM!
+// Follow the finite state machine on pages 25.
+localparam S_QUERY_RX = 0;
+localparam S_READ = 1;
+localparam S_CALC = 2;
+localparam S_QUERY_TX = 3;
+localparam S_WRITE = 4;
 
+// module output assignment
+assign avm_writedata = result_r[247-:8];
+assign avm_address = avm_address_r;
+assign avm_read = avm_read_r;
+assign avm_write = avm_write_r;
+
+// parameters communicating with core
+logic [2*`REF_MAX_LENGTH-1:0] ref_r, ref_w;
+logic [2*`READ_MAX_LENGTH-1:0] read_r, read_w;
+logic [`DP_SW_SCORE_BITWIDTH-1:0] alignment_score_r;
+logic [$clog2(`REF_MAX_LENGTH)-1:0] column_r;
+logic [$clog2(`READ_MAX_LENGTH)-1:0] row_r;
+logic core_read_ready_r, core_write_ready_r;
+logic wrapper_read_ready_w, wrapper_write_ready_w, wrapper_read_ready_r, wrapper_write_ready_r;
+
+// local paramenters
+logic [2:0] state_r, state_w;
+logic [6:0] bytes_counter_r, bytes_counter_w;
+logic [247:0] result_r, result_w;
+logic [4:0] avm_address_w, avm_address_r;
+logic avm_read_r, avm_read_w;
+logic avm_write_r, avm_write_w;
 // Remember to complete the port connection
 SW_core sw_core(
     .clk				(avm_clk),
     .rst				(avm_rst),
 
-	.o_ready			(),
-    .i_valid			(),
-    .i_sequence_ref		(),
-    .i_sequence_read	(),
-    .i_seq_ref_length	(),
-    .i_seq_read_length	(),
+	.o_ready			(core_read_ready_r),
+    .i_valid			(wrapper_read_ready_r),
+    .i_sequence_ref		(ref_r),
+    .i_sequence_read	(read_r),
+    .i_seq_ref_length	(`REF_LENGTH),
+    .i_seq_read_length	(`READ_LENGTH),
     
-    .i_ready			(),
-    .o_valid			(),
-    .o_alignment_score	(),
-    .o_column			(),
-    .o_row				()
+    .i_ready			(wrapper_write_ready_r),
+    .o_valid			(core_write_ready_r),
+    .o_alignment_score	(alignment_score_r),
+    .o_column			(column_r),
+    .o_row				(row_r)
 );
 
 task StartRead;
@@ -70,18 +98,102 @@ endtask
 
 // TODO
 always_comb begin
-    
+    case (state_r) 
+        S_QUERY_RX: begin
+            if (~avm_waitrequest && avm_readdata[RX_OK_BIT] == 1) begin
+                StartRead(RX_BASE);
+                state_w = S_READ;
+                bytes_counter_w = bytes_counter_r + 1;
+            end else begin
+                StartRead(STATUS_BASE);
+            end
+        end
+        S_READ: begin
+            if (~avm_waitrequest) begin
+                StartRead(STATUS_BASE);
+                if (bytes_counter_r <= (`REF_MAX_LENGTH >> 2)) begin
+                    // reference sequence
+                    state_w = S_QUERY_RX;
+                    ref_w = {ref_r[2*`REF_MAX_LENGTH-9:0], avm_readdata[7:0]};
+                    wrapper_read_ready_w = 0;
+                end
+                else (bytes_counter_r <= (`READ_MAX_LENGTH >> 2)) begin
+                    // read sequence
+                    state_w = S_QUERY_RX;
+                    read_w = {read_r[2*`READ_MAX_LENGTH-9:0], avm_readdata[7:0]};
+                    wrapper_read_ready_w = 0;
+                end
+                else begin
+                    // finished
+                    state_w = S_CALC;
+                    read_w = {read_r[2*`READ_MAX_LENGTH-9:0], avm_readdata[7:0]};
+                    bytes_counter_w = 0;
+                    wrapper_read_ready_w = 1;
+                end
+            end
+        end
+        S_CALC: begin
+            if (core_write_ready_r) begin
+                if (~wrapper_write_ready_r) begin
+                    wrapper_write_ready_w = 1;
+                end else begin
+                    result_w[191:0] = {column_r[63:0], row_r[63:0], alignment_score_r[63:0]};
+                    state_w = S_QUERY_TX;
+                    wrapper_write_ready_w = 0;
+                end
+            end
+        end
+        S_QUERY_TX: begin
+            if (~avm_waitrequest && avm_readdata[TX_OK_BIT] == 1) begin
+                StartWrite(TX_BASE);
+                state_w = S_WRITE;
+                bytes_counter_w = bytes_counter_r + 1;
+            end
+        end
+        S_WRITE: begin
+            if (~avm_waitrequest) begin
+                StartRead(STATUS_BASE);
+                if (bytes_counter_r == 31) begin
+                    state_w = S_QUERY_RX;
+                end else begin
+                    state_w = S_QUERY_TX;
+                    result_w = {result_r[239:0], result_r[247:240]};    
+                end
+            end
+        end
+        default: begin
+
+        end
 end
 
 // TODO
 always_ff @(posedge avm_clk or posedge avm_rst) begin
     if (avm_rst) begin
-    	
-
+    	ref_r <= 0;
+        read_r <= 0;
+        alignment_score_r <= 0;
+        column_r <= 0;
+        row_r <= 0;
+        wrapper_read_ready_r <= 0;
+        wrapper_write_ready_r <= 0;
+        state_r <= S_QUERY_RX;
+        bytes_counter_r <= 0;
+        result_r <= 0;
+        avm_address_r <= STATUS_BASE;
+        avm_read_r <= 1;
+        avm_write_r <= 0;
     end
 	else begin
-    	
-
+    	ref_r <= ref_w;
+        read_r <= read_w;
+        wrapper_read_ready_r <= wrapper_read_ready_w;
+        wrapper_write_ready_r <= wrapper_write_ready_w;
+        state_r <= state_w;
+        bytes_counter_r <= bytes_counter_w;
+        result_r <= result_w;
+        avm_address_r <= avm_address_w;
+        avm_read_r <= avm_read_w;
+        avm_write_r <= avm_write_w;
     end
 end
 
