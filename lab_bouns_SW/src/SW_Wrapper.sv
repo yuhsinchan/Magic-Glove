@@ -151,23 +151,23 @@ always_comb begin
             end
         end
         S_CALC: begin
+            wrapper_read_ready_w = 0;
             if (core_write_ready_w) begin
-                if (~wrapper_write_ready_r) begin
-                    wrapper_write_ready_w = 1;
-                end else begin
-                    result_w[`DP_SW_SCORE_BITWIDTH-1-:`DP_SW_SCORE_BITWIDTH] = alignment_score;
-                    result_w[63+$clog2(`READ_MAX_LENGTH)-:$clog2(`READ_MAX_LENGTH)] = row;
-                    result_w[127+$clog2(`REF_MAX_LENGTH)-:$clog2(`REF_MAX_LENGTH)] = column;
-                    state_w = S_QUERY_TX;
-                    wrapper_write_ready_w = 0;
-                end
+                result_w[`DP_SW_SCORE_BITWIDTH-1-:`DP_SW_SCORE_BITWIDTH] = alignment_score;
+                result_w[63+$clog2(`READ_MAX_LENGTH)-:$clog2(`READ_MAX_LENGTH)] = row;
+                result_w[127+$clog2(`REF_MAX_LENGTH)-:$clog2(`REF_MAX_LENGTH)] = column;
+                $display("score, row, col: %d, %d, %d", alignment_score, row, column);
+                state_w = S_QUERY_TX;
+                wrapper_write_ready_w = 1;
             end
         end
         S_QUERY_TX: begin
             if (~avm_waitrequest && avm_readdata[TX_OK_BIT] == 1) begin
+                // $display("counter, data: %d, %-h", bytes_counter_r, avm_writedata);
                 StartWrite(TX_BASE);
                 state_w = S_WRITE;
                 bytes_counter_w = bytes_counter_r + 1;
+                   
             end else begin
                 StartRead(STATUS_BASE);
             end
@@ -179,9 +179,11 @@ always_comb begin
                     bytes_counter_w = 0;
                     state_w = S_QUERY_RX;
                     avm_write_w = 0;
+                    wrapper_write_ready_w = 0;
+                    result_w = 0;
                 end else begin
                     state_w = S_QUERY_TX;
-                    result_w = {result_r[239:0], result_r[247:240]};    
+                    result_w = {result_r[239:0], result_r[247:240]};
                 end
             end
         end

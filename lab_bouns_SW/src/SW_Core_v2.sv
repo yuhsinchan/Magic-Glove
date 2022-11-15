@@ -198,7 +198,6 @@ module SW_core(
                     PE_align_score_dd_n[i] = 0;
                     PE_insert_score_dd_n[i] = 0;
                     PE_delete_score_dd_n[i] = 0;
-                    PE_score_buff_n[i] = 0;
                     counter_n = 0;
                 end
 
@@ -306,6 +305,8 @@ module SW_core(
                 seq_A_length                                                <= i_seq_ref_length;
                 seq_B_length                                                <= i_seq_read_length;
                 sequence_A_shifter                                          <= i_sequence_ref;
+                $display("seqA: %b", i_sequence_ref);
+                $display("segB: %b", i_sequence_read);
             end else begin
                 sequence_A                                                  <= sequence_A_n;
                 sequence_B                                                  <= sequence_B_n;
