@@ -114,7 +114,7 @@ module SW_core(
                     .i_A_base                   (PE_last_A_base[gv-1]                       ),
                     .i_B_base_valid             (sequence_B_valid[gv]                       ),
                     .i_B_base                   (sequence_B[2*`READ_MAX_LENGTH-1-(2*gv)-:2] ),
-                    .i_debug                    (gv == 1),
+                    .i_debug                    (gv == 0),
                     
                     .i_align_diagonal_score     (PE_align_score_dd [gv-1]                   ),
                     .i_align_top_score          (PE_align_score_d  [gv-1]                   ),
@@ -211,7 +211,7 @@ module SW_core(
 
             S_calculate: begin
                 // $display("calculate state");
-                $display("counter: %d", counter);
+                // $display("counter: %d", counter);
                 // $display("seqA+SeqB: %d", seq_A_length_n + seq_B_length_n);
                 counter_n = counter + 1;
                 sequence_A_shifter_n = {sequence_A_shifter[2*`REF_MAX_LENGTH-3:0], sequence_A_shifter[2*`REF_MAX_LENGTH-1-:2]};
@@ -221,7 +221,7 @@ module SW_core(
                         if (PE_score_buff_n[i] > row_highest_scores[i]) begin
                             // $display("higher, update");
                             row_highest_scores_n[i] = PE_score_buff_n[i];
-                            row_highest_columns_n[i] = counter - i - 1;
+                            row_highest_columns_n[i] = counter - i;
                         end
                     end
                 end
@@ -376,7 +376,7 @@ module DP_PE_single(
 
 // *** TODO
 
-always@(posedge clk or posedge rst) begin
+always@(negedge clk or posedge rst) begin
     if (rst) begin
         o_last_A_base_valid <= 0;
         o_last_A_base       <= 0;
@@ -385,51 +385,67 @@ always@(posedge clk or posedge rst) begin
         o_last_A_base       <= i_A_base;
         if (i_A_base_valid && i_B_base_valid) begin
             if (i_debug) begin
-                $display("A, B base: %d, %d", i_A_base, i_B_base);
-                $display("i_align_diag: %d", i_align_diagonal_score);
-                $display("i_align_top: %d", i_align_top_score);
+                //$display("A, B base: %d, %d", i_A_base, i_B_base);
+                // $display("i_align_diag: %d", i_align_diagonal_score);
+                // $display("i_insert_diag: %d", i_insert_diagonal_score);
+                // $display("i_delete_diag: %d", i_delete_diagonal_score);
+                // $display("i_align_top: %d", i_align_top_score);
+                // $display("i_align_top: %d", i_align_left_score);
             end
             if (i_A_base == i_B_base) begin
                 if (i_align_diagonal_score > i_insert_diagonal_score && i_align_diagonal_score > i_delete_diagonal_score) begin
                     o_align_score <= i_align_diagonal_score + `CONST_MATCH_SCORE;
                     o_the_score <= i_align_diagonal_score + `CONST_MATCH_SCORE;
+                    if (i_debug) $display("%-d", i_align_diagonal_score + `CONST_MATCH_SCORE);
                 end else if (i_insert_diagonal_score > i_delete_diagonal_score) begin
                     o_align_score <= i_insert_diagonal_score + `CONST_MATCH_SCORE;
                     o_the_score <= i_insert_diagonal_score + `CONST_MATCH_SCORE;
+                    if (i_debug) $display("%-d", i_insert_diagonal_score + `CONST_MATCH_SCORE);
                 end else begin
                     o_align_score <= i_delete_diagonal_score + `CONST_MATCH_SCORE;
                     o_the_score <= i_delete_diagonal_score + `CONST_MATCH_SCORE;
+                    if (i_debug) $display("%-d", i_delete_diagonal_score + `CONST_MATCH_SCORE);
                 end
             end else begin
                 if (i_align_diagonal_score > i_insert_diagonal_score && i_align_diagonal_score > i_delete_diagonal_score && i_align_diagonal_score + `CONST_MISMATCH_SCORE > 0) begin
                     o_align_score <= i_align_diagonal_score + `CONST_MISMATCH_SCORE;
                     o_the_score <= i_align_diagonal_score + `CONST_MISMATCH_SCORE;
+                    if (i_debug) $display("%-d", i_align_diagonal_score + `CONST_MISMATCH_SCORE);
                 end else if (i_insert_diagonal_score > i_delete_diagonal_score && i_insert_diagonal_score + `CONST_MISMATCH_SCORE > 0) begin
                     o_align_score <= i_insert_diagonal_score + `CONST_MISMATCH_SCORE;
                     o_the_score <= i_insert_diagonal_score + `CONST_MISMATCH_SCORE;
+                    if (i_debug) $display("%-d", i_insert_diagonal_score + `CONST_MISMATCH_SCORE);
                 end else if (i_delete_diagonal_score + `CONST_MISMATCH_SCORE > 0) begin
                     o_align_score <= i_delete_diagonal_score + `CONST_MISMATCH_SCORE;
                     o_the_score <= i_delete_diagonal_score + `CONST_MISMATCH_SCORE;
+                    if (i_debug) $display("%-d", i_delete_diagonal_score + `CONST_MISMATCH_SCORE);
                 end else begin
                     o_align_score <= 0;
                     o_the_score <= 0;
+                    if (i_debug) $display("%-d", 0);
                 end
             end
 
             if (i_align_top_score + `CONST_GAP_OPEN > i_insert_top_score + `CONST_GAP_EXTEND && i_align_top_score + `CONST_GAP_OPEN > 0) begin
                 o_insert_score <= i_align_top_score + `CONST_GAP_OPEN;
-            end else if (i_insert_left_score + `CONST_GAP_EXTEND > 0) begin
+                if (i_debug) $display("ins: %-d", i_align_top_score + `CONST_GAP_OPEN);
+            end else if (i_insert_top_score + `CONST_GAP_EXTEND > 0) begin
                 o_insert_score <= i_insert_top_score + `CONST_GAP_EXTEND;
+                if (i_debug) $display("ins: %-d", i_insert_top_score + `CONST_GAP_EXTEND);
             end else begin
                 o_insert_score <= 0;
+                if (i_debug) $display("ins: %-d", 0);
             end
 
             if (i_align_left_score + `CONST_GAP_OPEN > i_delete_left_score + `CONST_GAP_EXTEND && i_align_left_score + `CONST_GAP_OPEN > 0) begin
                 o_delete_score <= i_align_left_score + `CONST_GAP_OPEN;
+                if (i_debug) $display("del: %-d", i_align_left_score + `CONST_GAP_OPEN);
             end else if (i_delete_left_score + `CONST_GAP_EXTEND > 0) begin
                 o_delete_score <= i_delete_left_score + `CONST_GAP_EXTEND;
+                if (i_debug) $display("del: %-d", i_delete_left_score + `CONST_GAP_EXTEND);
             end else begin
                 o_delete_score <= 0;
+                if (i_debug) $display("del: %-d", 0);
             end
         end
     end
