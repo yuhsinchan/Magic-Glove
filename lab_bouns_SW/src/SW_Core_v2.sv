@@ -215,7 +215,7 @@ module SW_core(
                 counter_n = counter + 1;
                 sequence_A_shifter_n = {sequence_A_shifter[2*`REF_MAX_LENGTH-3:0], sequence_A_shifter[2*`REF_MAX_LENGTH-1-:2]};
                 // $display("sequence: %b", sequence_A_shifter);
-                for (i=0;i<seq_B_length;i=i+1) begin
+                for (i=0;i<`READ_MAX_LENGTH;i=i+1) begin
                     if (counter >= i+1 && counter-i <= seq_A_length) begin
                         if (PE_score_buff_n[i] > row_highest_scores[i]) begin
                             // $display("higher, update");
@@ -224,7 +224,7 @@ module SW_core(
                         end
                     end
                 end
-                for (i=0;i<seq_B_length;i=i+1) begin
+                for (i=0;i<`READ_MAX_LENGTH;i=i+1) begin
                     if (PE_last_A_base_valid[i]) begin
                         PE_align_score_d_n[i] = PE_align_score[i];
                         PE_insert_score_d_n[i] = PE_insert_score[i];
@@ -232,7 +232,7 @@ module SW_core(
                     end
                 end
 
-                for (i=0;i<seq_B_length;i=i+1) begin
+                for (i=0;i<`READ_MAX_LENGTH;i=i+1) begin
                     if (PE_last_A_base_valid[i]) begin
                         PE_align_score_dd_n[i] = PE_align_score_d[i];
                         PE_insert_score_dd_n[i] = PE_insert_score_d[i];
