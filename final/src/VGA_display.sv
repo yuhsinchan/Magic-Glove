@@ -1,6 +1,7 @@
 module VGA_display(
-    input i_clk,
-    input i_rst_n,
+    input i_clk, // 25MHz
+    input i_rst,
+	 input i_start,
     output [7:0] o_VGA_G,
     output [7:0] o_VGA_B,
     output [7:0] o_VGA_R,
@@ -11,63 +12,147 @@ module VGA_display(
     output o_VGA_clk
 );
 
-VGA_clock VGA_clk(
-	.i_clk(i_clk),
-	.i_rst_n(i_rst_n),
-	.o_vga_clk(pix_clk)
-);
-
-logic pix_clk;
-logic [9:0] counter_x;
-logic [9:0] counter_y;
-logic [7:0] vga_R;
-logic [7:0] vga_B;
-logic [7:0] vga_G;
+logic [9:0] counter_x_r, counter_x_w;
+logic [9:0] counter_y_r, counter_y_w;
+logic hsync_r, hsync_w;
+logic vsync_r, vsync_w;
+logic [7:0] vga_R_r, vga_R_w, vga_B_r, vga_B_w, vga_G_r, vga_G_w; 
+logic state_r, state_w;
 
 // horizontal timings
-parameter HA_END = 639;
-parameter HS_STA = HA_END + 16;
-parameter HS_END = HS_STA + 96;
-parameter LINE = 799;
+parameter H_FRONT = 16;
+parameter H_SYNC = 96;
+parameter H_BACK = 48;
+parameter H_ACT = 640;
+parameter H_BLANK = H_FRONT + H_SYNC + H_BACK;
+parameter H_TOTAL = H_FRONT + H_SYNC + H_BACK + H_ACT;
 
 // vertical timings
-parameter VA_END = 479;
-parameter VS_STA = VA_END + 10;
-parameter VS_END = VS_STA + 2;
-parameter SCREEN = 524;
+parameter V_FRONT = 10;
+parameter V_SYNC = 2;
+parameter V_BACK = 33;
+parameter V_ACT = 480;
+parameter V_BLANK = V_FRONT + V_SYNC + V_BACK;
+parameter V_TOTAL = V_FRONT + V_SYNC + V_BACK + V_ACT;
 
-assign o_VGA_clk = pix_clk;
-assign o_VGA_G = vga_G;
-assign o_VGA_B = vga_B;
-assign o_VGA_R = vga_R;
+// FSM
+parameter S_IDLE = 1'b0;
+parameter S_DISPLAY = 1'b1;
+
+// output
+assign o_VGA_B = vga_B_r;
+assign o_VGA_R = vga_R_r;
+assign o_VGA_G = vga_G_r;
+assign o_VGA_clk = i_clk;
+assign o_VGA_HS = hsync_r;
+assign o_VGA_VS = vsync_r;
+assign o_VGA_blank = ~((counter_x_r < H_BLANK) || (counter_y_r < V_BLANK));
+
 
 // test color
 parameter test_R = 255;
 parameter test_G = 0;
 parameter test_B = 0;
+
+// state transition
 always_comb begin
-    vga_B = test_B;
-    vga_R = test_R;
-    vga_G = test_G;
+    case(state_r)
+        S_IDLE: begin
+            if (i_start) begin
+                state_w = S_DISPLAY;
+            end else begin
+                state_w = state_r;
+            end
+        end
+        S_DISPLAY: begin
+            state_w = state_r;
+        end
+    endcase
 end
 
+// pixel position
 always_comb begin
-    o_VGA_HS = ~(counter_x >= HS_STA && counter_x < HS_END);
-    o_VGA_VS = ~(counter_y >= VS_STA && counter_y < VS_END); 
-    o_VGA_blank = 0;
-    o_VGA_sync = 0;
-end
-
-always_ff @(posedge pix_clk ) begin
-    if (counter_x == LINE) begin
-        counter_x <= 0;
-        counter_y <= (counter_y == SCREEN) ? 0 : counter_y + 1;
-    end else begin
-        counter_x <= counter_x + 1;
+    S_IDLE: begin
+        counter_x_w = 0;
+        counter_y_w = 0;
     end
-    if (i_rst_n) begin
-        counter_x <= 0;
-        counter_y <= 0;
+    S_DISPLAY: begin
+        if (counter_x_r == H_TOTAL) begin
+            if (counter_y_r == V_TOTAL) begin
+                counter_y_w = 0;
+            end else begin
+                counter_y_w = counter_y_r + 1;
+            end
+            counter_x_w = 0;
+        end else begin
+            counter_x_w = counter_x_r + 1;
+            counter_y_w = counter_y_r;
+        end
+    end
+end
+
+// sync logic
+always_comb begin
+    case(state_r)
+        S_IDLE: begin
+            // the value holds the opposite, 1 stands for not sync
+            hsync_w = 1;
+            vsync_w = 1;
+        end
+        S_DISPLAY: begin
+            if (counter_x_r == 0) begin
+                hsync_w = 1'b0;
+            end else if (counter_x_r == H_SYNC) begin
+                hsync_w = 1'b1;
+            end else begin
+                hsync_w = hsync_r;
+            end
+            if (counter_y_r == 0) begin
+                vsync_w = 1'b0;
+            end else if (counter_y_r == V_SYNC) begin
+                vsync_w = 1'b1;
+            end else begin
+                vsync_w = vsync_r;
+            end
+        end
+    endcase
+end
+
+// RGB
+always_comb begin
+    case(state_r)
+        S_IDLE: begin
+            vga_B_w = 8'b0;
+            vga_R_w = 8'b0;
+            vga_G_w = 8'b0;
+        end
+        S_DISPLAY: begin
+            vga_B_w = 8'b11111111;
+            vga_R_w = 8'b0;
+            vga_G_w = 8'b0;
+        end
+    endcase
+end
+
+always_ff @(posedge i_clk or negedge i_rst) begin
+    if (!i_rst) begin
+        counter_x_r <= 0;
+        counter_y_r <= 0;
+        hsync_r <= 1;
+        vsync_r <= 1;
+        vga_B_r <= 8'b0;
+        vga_G_r <= 8'b0;
+        vga_R_r <= 8'b0;
+        state_r <= S_IDLE;
+    end else begin
+        counter_x_r <= counter_x_w;
+        counter_y_r <= counter_y_w;
+        hsync_r <= hsync_w;
+        vsync_r <= vsync_w;
+        vga_B_r <= vga_B_w;
+        vga_G_r <= vga_G_w;
+        vga_R_r <= vga_R_w;
+        state_r <= state_w;
     end
     
 end

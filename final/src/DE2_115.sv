@@ -136,19 +136,11 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
-logic keydown;
-logic [3:0] random_value;
-
-// Debounce deb0(
-// 	.i_in(KEY[0]),
-// 	.i_rst_n(KEY[1]),
-// 	.i_clk(CLOCK_50),
-// 	.o_neg(keydown)
-// );
-
-VGA_display display(
-	.i_clk(CLOCK_50),
-	.i_rst_n(KEY[1]),
+qsys my_qsys(
+	.clk_clk(CLOCK_50),
+	.reset_reset_n(KEY[0]),
+	.uart_0_external_connection_rxd(UART_RXD),
+	.uart_0_external_connection_txd(UART_TXD),
 	.o_VGA_G(VGA_G),
 	.o_VGA_B(VGA_B),
 	.o_VGA_R(VGA_R),
@@ -158,12 +150,6 @@ VGA_display display(
 	.o_VGA_sync(VGA_SYNC_N),
 	.o_VGA_clk(VGA_CLK)
 );
-
-// SevenHexDecoder seven_dec0( 
-// 	.i_hex(random_value),
-// 	.o_seven_ten(HEX1),
-// 	.o_seven_one(HEX0)
-// );
 
 assign HEX2 = '1;
 assign HEX3 = '1;
