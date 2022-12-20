@@ -1,0 +1,5 @@
+PLL_Name	VGAqsys:vgaqsys|VGAqsys_altpll_0:altpll_0|VGAqsys_altpll_0_altpll_k842:sd1|pll7
+PLLJITTER	24
+PLLSPEmax	84
+PLLSPEmin	-53
+

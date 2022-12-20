@@ -134,8 +134,8 @@ always_comb begin
     endcase
 end
 
-always_ff @(posedge i_clk or negedge i_rst) begin
-    if (!i_rst) begin
+always_ff @(posedge i_clk or posedge i_rst) begin
+    if (i_rst) begin
         counter_x_r <= 0;
         counter_y_r <= 0;
         hsync_r <= 1;

@@ -1,0 +1,101 @@
+------------------------------------------------------------
+TimeQuest Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow 1200mV 85C Model Setup 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 36.229
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Hold 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 0.402
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Recovery 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 37.709
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Removal 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 1.047
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 9.819
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'CLOCK3_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 19.552
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Setup 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 36.507
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Hold 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 0.354
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Recovery 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 37.880
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Removal 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 0.955
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 9.799
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'CLOCK3_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 19.552
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Setup 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 37.974
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Hold 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 0.182
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Recovery 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 38.679
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Removal 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 0.497
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : 9.400
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'CLOCK3_50'
+Slack : 16.000
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'vgaqsys|altpll_0|sd1|pll7|clk[0]'
+Slack : 19.621
+TNS   : 0.000
+
+------------------------------------------------------------

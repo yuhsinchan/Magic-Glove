@@ -1,0 +1,16 @@
+<sld_project_info>
+  <project>
+    <hash md5_digest_80b="8405a4452c8b2f5ae9f0"/>
+  </project>
+  <file_info>
+    <file device="EP4CE115F29C7" path="DE2-115.sof" usercode="0xFFFFFFFF"/>
+  </file_info>
+  <sld_infos>
+    <sld_info hpath="VGAqsys:vgaqsys" name="vgaqsys">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME VGAqsys HAS_SOPCINFO 1 GENERATION_ID 1671530575"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+  </sld_infos>
+</sld_project_info>

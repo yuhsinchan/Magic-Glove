@@ -136,11 +136,10 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
-qsys my_qsys(
+VGAqsys vgaqsys(
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(KEY[0]),
-	.uart_0_external_connection_rxd(UART_RXD),
-	.uart_0_external_connection_txd(UART_TXD),
+	.i_start(KEY[1]),
 	.o_VGA_G(VGA_G),
 	.o_VGA_B(VGA_B),
 	.o_VGA_R(VGA_R),
@@ -150,13 +149,6 @@ qsys my_qsys(
 	.o_VGA_sync(VGA_SYNC_N),
 	.o_VGA_clk(VGA_CLK)
 );
-
-assign HEX2 = '1;
-assign HEX3 = '1;
-assign HEX4 = '1;
-assign HEX5 = '1;
-assign HEX6 = '1;
-assign HEX7 = '1;
 
 `ifdef DUT_LAB1
 	initial begin
