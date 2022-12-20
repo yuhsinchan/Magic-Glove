@@ -108,6 +108,6 @@ VGA_display vga(
     .o_VGA_HS(o_VGA_HS),
     .o_VGA_VS(o_VGA_VS),
     .o_VGA_sync(o_VGA_sync),
-	 .o_VGA_clk(o_VGA_clk)
+	.o_VGA_clk(o_VGA_clk)
 );
 endmodule
