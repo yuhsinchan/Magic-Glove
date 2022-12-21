@@ -14,6 +14,7 @@ module VGA_display(
 
 logic [9:0] counter_x_r, counter_x_w;
 logic [9:0] counter_y_r, counter_y_w;
+logic [9:0] active_x, active_y;
 logic hsync_r, hsync_w;
 logic vsync_r, vsync_w;
 logic [7:0] vga_R_r, vga_R_w, vga_B_r, vga_B_w, vga_G_r, vga_G_w; 
@@ -48,6 +49,8 @@ assign o_VGA_clk = i_clk;
 assign o_VGA_HS = hsync_r;
 assign o_VGA_VS = vsync_r;
 assign o_VGA_blank = ~((counter_x_r < H_BLANK) || (counter_y_r < V_BLANK));
+assign active_x = counter_x_r < H_BLANK ? -1 : counter_x_r - H_BLANK;
+assign active_y = counter_y_r < V_BLANK ? -1 : counter_y_r - V_BLANK;
 
 // pattern test const
 localparam PATTERN = 8'd0;
@@ -56,8 +59,8 @@ localparam NEXT = 0;
 
 // patterns
 logic [4:0] word_count_r, word_count_w; // max 32 words
-logic [7:0] pattern_number_r [31:0];
-logic [7:0] pattern_number_w [31:0];
+logic [7:0] pattern_number_r [0:31];
+logic [7:0] pattern_number_w [0:31];
 
 // test combinational circuit
 always_comb begin
@@ -166,8 +169,8 @@ end
 VGA_color color(
     .i_clk(i_clk),
     .i_rst(i_rst),
-    .i_x_pos(counter_x_r),
-    .i_y_pos(counter_y_r),
+    .i_x_pos(active_x),
+    .i_y_pos(active_y),
     .i_word_cnt(word_count_r),
     .i_pattern_num(pattern_number_r),
     .o_Blue(o_VGA_B),
