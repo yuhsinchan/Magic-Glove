@@ -1,47 +1,64 @@
-`timescale 1ns/100ps
+`timescale 1ns / 100ps
 
 module tb;
-  localparam CLK = 10;
-  localparam HCLK = CLK / 2;
-  localparam SF = 2.0 ** -8.0;
-  
-  logic clk;
-  logic [15:0] data, mean, std, norm;
-  
-  initial clk = 0;
-  always #HCLK clk = ~clk;
-  // logic [23:0] fx_point;
-  
-  Normalize Norm(
-    .i_data(data),
-    .i_mean(mean),
-    .i_std(std),
-    .o_norm(norm)
-  );
-  
-  initial begin
-    data = -69;
-    mean = 7;
-    std = 3;
-    
-    $display("data: %0d", $signed(data));
-    $display("mean: %0d", mean);
-    $display("std: %0d", std);
-    
-    /*
-    data = data - mean;
-    $display("data - mean: %0d", $signed(data));
-    $display("data - mean: %0b", data);
-    
-    fx_point = {data, 8'b0};
-    
-    $display("fx_point: %0b", fx_point);
-    
-    fx_point = ($signed(fx_point) > 0) ? (fx_point / std) : -(-fx_point / std);
-    */
-    @(posedge clk);
-    $display("norm: %b", norm);
-    $display("norm: %f", $itor($signed(norm) * SF));
-    $finish;
-  end
+    localparam CLK = 10;
+    localparam HCLK = CLK / 2;
+    localparam SF = 2.0 ** -8.0;
+
+    localparam [15:0] data[0:7] = '{
+      1012,
+      19,
+      -3,
+      303,
+      398,
+      403,
+      392,
+      347
+    };
+
+    logic clk, rst, start, finished;
+    logic [15:0] n[0:7];
+
+    initial clk = 0;
+    always #HCLK clk = ~clk;
+
+    Normalizer norm (
+        .i_clk(clk),
+        .i_rst_n(rst),
+        .i_start(start),
+        .i_data(data),
+        .o_norm(n),
+        .o_finished(finished)
+    );
+
+    initial begin
+        $fsdbDumpfile("final.fsdb");
+        $fsdbDumpvars;
+        rst <= 1;
+        #(2 * CLK);
+        rst <= 0;
+        @(posedge clk) rst <= 1;
+        $display("=========inputs============");
+        for (int i = 0; i < 1; i++) begin
+            $display("%0d\t%0d\t%0d\t%0d\t%0d\t%0d\t%0d\t%0d\n", $signed(data[i*8]),
+                     $signed(data[i*8+1]), $signed(data[i*8+2]), $signed(data[i*8+3]),
+                     $signed(data[i*8+4]), $signed(data[i*8+5]), $signed(data[i*8+6]),
+                     $signed(data[i*8+7]));
+        end
+
+        @(posedge clk) start <= 1;
+        @(posedge clk) start <= 0;
+
+        for (int i = 0; i < 30; i++) begin
+            @(posedge clk);
+        end
+
+        for (int i = 0; i < 8; i++) begin
+            $display("output %d: %f", i, $itor($signed(n[i]) * SF));
+        end
+
+        $finish;
+
+    end
+
 endmodule
