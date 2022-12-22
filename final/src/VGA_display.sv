@@ -1,3 +1,7 @@
+// display constant
+`define ROW_CNT 3
+`define ROW_SIZE 10
+
 module VGA_display(
     input i_clk, // 25MHz
     input i_rst,
@@ -19,7 +23,7 @@ logic hsync_r, hsync_w;
 logic vsync_r, vsync_w;
 logic [7:0] vga_R_r, vga_R_w, vga_B_r, vga_B_w, vga_G_r, vga_G_w; 
 logic state_r, state_w;
-integer i;
+integer i, j;
 
 // horizontal timings
 parameter H_FRONT = 16;
@@ -52,26 +56,56 @@ assign o_VGA_blank = ~((counter_x_r < H_BLANK) || (counter_y_r < V_BLANK));
 assign active_x = counter_x_r < H_BLANK ? -1 : counter_x_r - H_BLANK;
 assign active_y = counter_y_r < V_BLANK ? -1 : counter_y_r - V_BLANK;
 
-// pattern test const
-localparam PATTERN = 8'd0;
-localparam COUNT = 5'd1;
-localparam NEXT = 0;
-
 // patterns
-logic [4:0] word_count_r, word_count_w; // max 32 words
-logic [7:0] pattern_number_r [0:31];
-logic [7:0] pattern_number_w [0:31];
+logic [3:0] word_count_r [0:`ROW_CNT-1];
+logic [3:0] word_count_w [0:`ROW_CNT-1];
+logic [7:0] pattern_number_r [0:`ROW_CNT-1][0:`ROW_SIZE-1];
+logic [7:0] pattern_number_w [0:`ROW_CNT-1][0:`ROW_SIZE-1];
 
-// test combinational circuit
+// pattern display test
 always_comb begin
+    for (i = 0; i < `ROW_CNT; i = i+1) begin
+        for (j = 0; j < `ROW_SIZE; j = j+1) begin
+            pattern_number_w[i][j] = 0;
+        end
+        word_count_w[i] = 0;
+    end
     case(state_r)
         S_IDLE: begin
-            word_count_w = 0;
+            for (i = 0; i < `ROW_CNT; i = i+1) begin
+                for (j = 0; j < `ROW_SIZE; j = j+1) begin
+                    pattern_number_w[i][j] = 0;
+                end
+                word_count_w[i] = 0;
+            end
         end
         S_DISPLAY: begin
-            word_count_w = 5'd2;
-            pattern_number_w[0] = 8'd2;
-            pattern_number_w[1] = 8'd3;
+            word_count_w[0] = 8;
+            word_count_w[1] = 10;
+            word_count_w[2] = 3;
+            pattern_number_w[0][0] = 8'd37;
+            pattern_number_w[0][1] = 8'd10;
+            pattern_number_w[0][2] = 8'd15;
+            pattern_number_w[0][3] = 8'd8;
+            pattern_number_w[0][4] = 8'd26;
+            pattern_number_w[0][5] = 8'd22;
+            pattern_number_w[0][6] = 8'd2;
+            pattern_number_w[0][7] = 8'd15;
+
+            pattern_number_w[1][0] = 8'd10;
+            pattern_number_w[1][1] = 8'd20;
+            pattern_number_w[1][2] = 8'd1;
+            pattern_number_w[1][3] = 8'd14;
+            pattern_number_w[1][4] = 8'd26;
+            pattern_number_w[1][5] = 8'd1;
+            pattern_number_w[1][6] = 8'd29;
+            pattern_number_w[1][7] = 8'd42;
+            pattern_number_w[1][8] = 8'd46;
+            pattern_number_w[1][9] = 8'd46;
+
+            pattern_number_w[2][0] = 8'd16;
+            pattern_number_w[2][1] = 8'd19;
+            pattern_number_w[2][2] = 8'd27;
         end
     endcase
 end
@@ -142,20 +176,24 @@ end
 
 always_ff @(posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
-        for (i = 0; i < 32; i = i+1) begin
-            pattern_number_r[i] <= 8'd0;
+        for (i = 0; i < `ROW_CNT; i = i+1) begin
+            for (j = 0; j < `ROW_SIZE; j = j+1) begin
+                pattern_number_r[i][j] <= 8'd0;
+            end
+            word_count_r[i] <= 0;
         end
-        word_count_r <= 0;
         counter_x_r <= 0;
         counter_y_r <= 0;
         hsync_r <= 1;
         vsync_r <= 1;
         state_r <= S_IDLE;
     end else begin
-        for (i = 0; i < 32; i = i+1) begin
-            pattern_number_r[i] <= pattern_number_w[i];
+        for (i = 0; i < `ROW_CNT; i = i+1) begin
+            for (j = 0; j < `ROW_SIZE; j = j+1) begin
+                pattern_number_r[i][j] <= pattern_number_w[i][j];
+            end
+            word_count_r[i] <= word_count_w[i];
         end
-        word_count_r <= word_count_w;
         counter_x_r <= counter_x_w;
         counter_y_r <= counter_y_w;
         hsync_r <= hsync_w;
