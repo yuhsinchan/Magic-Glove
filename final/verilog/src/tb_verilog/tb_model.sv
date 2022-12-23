@@ -49,7 +49,8 @@ module tb;
     };
 
     logic clk, rst, start, finished;
-    logic [31:0] logits[0:26];
+    logic [31:0] logits[0:2];
+    logic [4:0] chars[0:2];
     logic [23:0] cnn_output[0:29];
     logic [15:0] norm_data[0:39];
 
@@ -64,6 +65,7 @@ module tb;
         .o_norm(norm_data),
         .o_cnn(cnn_output),
         .o_logits(logits),
+        .o_char(chars),
         .o_finished(finished)
     );
 
@@ -87,7 +89,7 @@ module tb;
         @(posedge clk) start <= 1;
         @(posedge clk) start <= 0;
 
-        for (int i = 0; i < 30; i++) begin
+        for (int i = 0; i < 200; i++) begin
             @(posedge clk);
         end
 
@@ -108,8 +110,8 @@ module tb;
         end
 
         $display("=========fc============");
-        for (int i = 0; i < 27; i++) begin
-            $display("output %c: %f", i + 'h41, $itor($signed(logits[i]) * SF));
+        for (int i = 0; i < 3; i++) begin
+            $display("output %c: %f", chars[i] + 'h41, $itor($signed(logits[i]) * SF));
         end
 
         $finish;
