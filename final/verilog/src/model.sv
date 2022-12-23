@@ -1218,7 +1218,9 @@ module Model (
 
     assign o_norm = norm_data;
     assign o_cnn = cnn_output;
-    assign o_logits = top3_prob_r;
+    assign o_logits[0] = {8'b0, top3_prob_r[0][31:8]};
+    assign o_logits[1] = {8'b0, top3_prob_r[1][31:8]};
+    assign o_logits[2] = {8'b0, top3_prob_r[2][31:8]};
     assign o_char = top3_char_r;
     assign o_finished = finish_r;
 
