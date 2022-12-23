@@ -20,10 +20,10 @@ module Core (
     logic [2:0] state_r, state_w;
 
     logic nn_start_r, nn_start_w;
+    logic [4:0] pre_top_chars_r[0:2], pre_top_chars_w[0:2];
     logic nn_finish;
     logic [31:0] nn_logits[0:2];
     logic [4:0] nn_top_chars[0:2];
-    logic [4:0] pre_top_chars_r[0:2], pre_top_chars_w[0:2];
 
     logic [31:0] sum_logits_r[0:26], sum_logits_w[0:26];
     logic [31:0] avg_logits_r[0:2], avg_logits_w[0:2];
@@ -39,10 +39,10 @@ module Core (
 
     logic next_r, next_w;
     logic finish_r, finish_w;
-    logic no_dup;
     logic [7:0] letter_r, letter_w;
     logic [74:0] word_r, word_w;
     logic [15:0] data_r[0:39], data_w[0:39];
+    logic no_dup;
 
     assign o_next = next_r;
     assign o_finished = finish_r;
@@ -82,13 +82,24 @@ module Core (
 
     always_comb begin
         nn_start_w = nn_start_r;
-        nn_logits_w = nn_logits_r;
-        nn_finish_w = nn_finish_r;
+        pre_top_chars_w = pre_top_chars_r;
+
+        sum_logits_w = sum_logits_r;
+        avg_logits_w = avg_logits_r;
+        dup_count_w = dup_count_r;
+
+        viter_start_w = viter_start_r;
+        viter_next_w = viter_next_r;
+
+        seq_length_w = seq_length_r;
+        seq_counter_w = seq_counter_r;
+        tmp_viter_seq_w = tmp_viter_seq_r;
 
         next_w = next_r;
         finish_w = finish_r;
         letter_w = letter_r;
         word_w = word_r;
+        data_w = data_r;
 
         state_w = state_r;
 
@@ -134,7 +145,7 @@ module Core (
                     if (dup_count_r > 30 & nn_top_chars[0] != 5'd26 & nn_top_chars[1] != 5'd26) begin
                         state_w = S_DTW;
                         dup_count_w = 0;
-                        sum_logits_w = {27{32'b0}};
+                        sum_logits_w = '{27{32'b0}};
                         seq_counter_w = 0;
                         tmp_viter_seq_w = viter_seq;
                     end else begin
@@ -165,8 +176,35 @@ module Core (
             end
             S_DONE: begin
                 finish_w = 1'b0;
+                state_w = S_IDLE;
             end
         endcase
+    end
+
+    always_ff @ (posedge i_clk or negedge i_rst_n) begin
+        if (!i_rst_n) begin
+            nn_start_r <= 1'b0;
+            pre_top_chars_r <= '{2{5'b0}};
+
+            sum_logits_r <= '{27{32'b0}};
+            avg_logits_r <= '{3{32'b0}};
+            dup_count_r <= 7'b0;
+
+            viter_start_r <= 1'b0;
+            viter_next_r <= 1'b0;
+
+            seq_length_r <= 4'b0;
+            seq_counter_r <= 4'b0;
+            tmp_viter_seq_r <= 120'b0;
+
+            next_r <= 1'b0;
+            finish_r <= 1'b0;
+            letter_r <= 8'b0;
+            word_r <= 75'b0;
+            data_r <= '{40{16'b0}};
+
+            state_r <= S_IDLE;
+        end
     end
 
 endmodule
