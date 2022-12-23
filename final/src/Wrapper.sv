@@ -63,6 +63,7 @@ logic [3:0] letter_count_r [0:`ROW_CNT-1];
 logic [3:0] letter_count_w [0:`ROW_CNT-1];
 logic [7:0] letters_r [0:`ROW_CNT-1][0:`ROW_SIZE-1];
 logic [7:0] letters_w [0:`ROW_CNT-1][0:`ROW_SIZE-1];
+logic [119:0] model_results;
 integer i, j;
 
 
@@ -148,20 +149,32 @@ always_comb begin
                     end
                 end
             end
+        end else if (model_finish) begin
+            for (i = 0; i < `ROW_CNT; i = i+1) begin
+                
+            end
         end
     end
-    
 end
 
 always_ff @( posedge avm_clk or posedge avm_rst ) begin
     if (avm_rst) begin
         state_r <= S_IDLE;
         counter_r <= 0;
+        for (i = 0; i < `ROW_CNT; i = i + 1) begin
+            for (j = 0; j < `ROW_SIZE; j = j + 1) begin
+                letters_r[i][j] <= 0;
+            end
+            letter_count_r[i] <= 0;
+        end
     end else if (i_start) begin
         state_r <= S_QUERY_RX;
         counter_r <= counter_w;
         for (i = 0; i < `ROW_CNT; i = i + 1) begin
-
+            for (j = 0; j < `ROW_SIZE; j = j + 1) begin
+                letters_r[i][j] <= 0;
+            end
+            letter_count_r[i] <= 0;
         end
     end else begin
         state_r <= state_w;

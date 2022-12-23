@@ -6,6 +6,8 @@ module VGA_display(
     input i_clk, // 25MHz
     input i_rst,
 	input i_start,
+    input [3:0] i_letter_cnt [0:`ROW_CNT-1],
+    input [7:0] i_letters [0:`ROW_CNT-1][0:`ROW_SIZE-1],
     output [7:0] o_VGA_G,
     output [7:0] o_VGA_B,
     output [7:0] o_VGA_R,
@@ -57,58 +59,58 @@ assign active_x = counter_x_r < H_BLANK ? -1 : counter_x_r - H_BLANK;
 assign active_y = counter_y_r < V_BLANK ? -1 : counter_y_r - V_BLANK;
 
 // patterns
-logic [3:0] word_count_r [0:`ROW_CNT-1];
-logic [3:0] word_count_w [0:`ROW_CNT-1];
-logic [7:0] pattern_number_r [0:`ROW_CNT-1][0:`ROW_SIZE-1];
-logic [7:0] pattern_number_w [0:`ROW_CNT-1][0:`ROW_SIZE-1];
+// logic [3:0] word_count_r [0:`ROW_CNT-1];
+// logic [3:0] word_count_w [0:`ROW_CNT-1];
+// logic [7:0] pattern_number_r [0:`ROW_CNT-1][0:`ROW_SIZE-1];
+// logic [7:0] pattern_number_w [0:`ROW_CNT-1][0:`ROW_SIZE-1];
 
 // pattern display test
-always_comb begin
-    for (i = 0; i < `ROW_CNT; i = i+1) begin
-        for (j = 0; j < `ROW_SIZE; j = j+1) begin
-            pattern_number_w[i][j] = 0;
-        end
-        word_count_w[i] = 0;
-    end
-    case(state_r)
-        S_IDLE: begin
-            for (i = 0; i < `ROW_CNT; i = i+1) begin
-                for (j = 0; j < `ROW_SIZE; j = j+1) begin
-                    pattern_number_w[i][j] = 0;
-                end
-                word_count_w[i] = 0;
-            end
-        end
-        S_DISPLAY: begin
-            word_count_w[0] = 8;
-            word_count_w[1] = 10;
-            word_count_w[2] = 3;
-            pattern_number_w[0][0] = 8'd37;
-            pattern_number_w[0][1] = 8'd10;
-            pattern_number_w[0][2] = 8'd15;
-            pattern_number_w[0][3] = 8'd8;
-            pattern_number_w[0][4] = 8'd26;
-            pattern_number_w[0][5] = 8'd22;
-            pattern_number_w[0][6] = 8'd2;
-            pattern_number_w[0][7] = 8'd15;
+// always_comb begin
+//     for (i = 0; i < `ROW_CNT; i = i+1) begin
+//         for (j = 0; j < `ROW_SIZE; j = j+1) begin
+//             pattern_number_w[i][j] = 0;
+//         end
+//         word_count_w[i] = 0;
+//     end
+//     case(state_r)
+//         S_IDLE: begin
+//             for (i = 0; i < `ROW_CNT; i = i+1) begin
+//                 for (j = 0; j < `ROW_SIZE; j = j+1) begin
+//                     pattern_number_w[i][j] = 0;
+//                 end
+//                 word_count_w[i] = 0;
+//             end
+//         end
+//         S_DISPLAY: begin
+//             word_count_w[0] = 8;
+//             word_count_w[1] = 10;
+//             word_count_w[2] = 3;
+//             pattern_number_w[0][0] = 8'd37;
+//             pattern_number_w[0][1] = 8'd10;
+//             pattern_number_w[0][2] = 8'd15;
+//             pattern_number_w[0][3] = 8'd8;
+//             pattern_number_w[0][4] = 8'd26;
+//             pattern_number_w[0][5] = 8'd22;
+//             pattern_number_w[0][6] = 8'd2;
+//             pattern_number_w[0][7] = 8'd15;
 
-            pattern_number_w[1][0] = 8'd10;
-            pattern_number_w[1][1] = 8'd20;
-            pattern_number_w[1][2] = 8'd1;
-            pattern_number_w[1][3] = 8'd14;
-            pattern_number_w[1][4] = 8'd26;
-            pattern_number_w[1][5] = 8'd1;
-            pattern_number_w[1][6] = 8'd29;
-            pattern_number_w[1][7] = 8'd42;
-            pattern_number_w[1][8] = 8'd46;
-            pattern_number_w[1][9] = 8'd46;
+//             pattern_number_w[1][0] = 8'd10;
+//             pattern_number_w[1][1] = 8'd20;
+//             pattern_number_w[1][2] = 8'd1;
+//             pattern_number_w[1][3] = 8'd14;
+//             pattern_number_w[1][4] = 8'd26;
+//             pattern_number_w[1][5] = 8'd1;
+//             pattern_number_w[1][6] = 8'd29;
+//             pattern_number_w[1][7] = 8'd42;
+//             pattern_number_w[1][8] = 8'd46;
+//             pattern_number_w[1][9] = 8'd46;
 
-            pattern_number_w[2][0] = 8'd16;
-            pattern_number_w[2][1] = 8'd19;
-            pattern_number_w[2][2] = 8'd27;
-        end
-    endcase
-end
+//             pattern_number_w[2][0] = 8'd16;
+//             pattern_number_w[2][1] = 8'd19;
+//             pattern_number_w[2][2] = 8'd27;
+//         end
+//     endcase
+// end
 
 // state transition
 always_comb begin
@@ -209,8 +211,8 @@ VGA_color color(
     .i_rst(i_rst),
     .i_x_pos(active_x),
     .i_y_pos(active_y),
-    .i_word_cnt(word_count_r),
-    .i_pattern_num(pattern_number_r),
+    .i_letter_cnt(i_letter_cnt),
+    .i_letters(i_letters),
     .o_Blue(o_VGA_B),
     .o_Green(o_VGA_G),
     .o_Red(o_VGA_R)
