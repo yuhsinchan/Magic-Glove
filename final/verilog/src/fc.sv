@@ -43,8 +43,8 @@ module FC(
 
     end
 
-    always_ff @ (posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @ (posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             weighted_sum_r <= 0;
             finish_r <= 0;
             state_r <= S_IDLE;

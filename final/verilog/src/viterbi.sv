@@ -12,9 +12,9 @@ module Viterbi (
     localparam S_IDLE = 2'd0;
     localparam S_CALC = 2'd1;
     localparam S_TOP = 2'd2;
-    localparam S_DONE = 2'd3;
+    //localparam S_DONE = 2'd3;
 
-    localparam [15:0] transition_prob[0:728] = '{
+    localparam bit [15:0] transition_prob[0:728] = '{
         16'h0235,
         16'h00fa,
         16'h0164,
@@ -743,7 +743,7 @@ module Viterbi (
         16'h0000,
         16'h0000,
         16'h0001,
-        16'h0006,
+        16'h0006
     };
 
     logic [4:0] prev_char_r[0:2], prev_char_w[0:2];
@@ -757,9 +757,6 @@ module Viterbi (
     logic [4:0] counter_r, counter_w;
     logic stepped_r, stepped_w, finish_r, finish_w;
 
-    assign o_prob[0] = topN_prob0_r;
-    assign o_prob[1] = topN_prob1_r;
-    assign o_prob[2] = topN_prob2_r;
     assign o_seq = top_seq_r;
 
     assign o_stepped = stepped_r;
@@ -767,13 +764,27 @@ module Viterbi (
 
     always_comb begin
         state_w = state_r;
+		  
+		  tmp_prob0_w = tmp_prob0_r;
+		  tmp_prob1_w = tmp_prob1_r;
+		  tmp_prob2_w = tmp_prob2_r;
+		  
+		  this_prob_w = this_prob_r;
+		  tmp_seq_w = tmp_seq_r;
+		  
         topN_prob0_w = topN_prob0_r;
         topN_prob1_w = topN_prob1_r;
         topN_prob2_w = topN_prob2_r;
-        topN_seq0_w = topN_seq0_r;
+        
+		  topN_seq0_w = topN_seq0_r;
         topN_seq1_w = topN_seq1_r;
         topN_seq2_w = topN_seq2_r;
-        top_seq_w = top_seq_r;
+        
+		  top_seq_w = top_seq_r;
+		  
+		  counter_w = counter_r;
+		  stepped_w = stepped_r;
+		  finish_w = finish_r;
 
         case (state_r)
             S_IDLE: begin
@@ -799,25 +810,25 @@ module Viterbi (
                     topN_seq0_w = {112'b0, i_char[0]};
                     topN_seq1_w = {112'b0, i_char[1]};
                     topN_seq2_w = {112'b0, i_char[2]};
-                    state_w = S_REST;
+                    state_w = S_IDLE;
                     prev_char_w = i_char;
                 end else begin
                     if (counter_r < 4) begin
                         if (counter_r < 3) begin
-                            tmp_prob0_w = topN_prob0_r * i_prob[counter_w] * transition_prob[(prev_char_r[0] + 1) * 27 + i_char[counter_r]];
-                            tmp_prob1_w = topN_prob1_r * i_prob[counter_w] * transition_prob[(prev_char_r[1] + 1) * 27 + i_char[counter_r]];
-                            tmp_prob2_w = topN_prob2_r * i_prob[counter_w] * transition_prob[(prev_char_r[2] + 1) * 27 + i_char[counter_r]];
+                            tmp_prob0_w = topN_prob0_r * i_prob[counter_r] * transition_prob[(prev_char_r[0] + 1) * 27 + i_char[counter_r]];
+                            tmp_prob1_w = topN_prob1_r * i_prob[counter_r] * transition_prob[(prev_char_r[1] + 1) * 27 + i_char[counter_r]];
+                            tmp_prob2_w = topN_prob2_r * i_prob[counter_r] * transition_prob[(prev_char_r[2] + 1) * 27 + i_char[counter_r]];
                         end
                         if (counter_r > 0) begin
                             if (tmp_prob0_r > tmp_prob1_r & tmp_prob0_r > tmp_prob2_r) begin
                                 tmp_seq_w[counter_r]   = {topN_seq0_r[111:0], 3'b0, i_char[counter_r] + 1};
-                                this_prob_w[counter_r] = tmp_prob0_w;
+                                this_prob_w[counter_r] = tmp_prob0_r;
                             end else if (tmp_prob1_r > tmp_prob0_r & tmp_prob1_r > tmp_prob2_r) begin
                                 tmp_seq_w[counter_r]   = {topN_seq1_r[111:0], 3'b0, i_char[counter_r] + 1};;
-                                this_prob_w[counter_r] = tmp_prob1_w;
+                                this_prob_w[counter_r] = tmp_prob1_r;
                             end else if (tmp_prob2_r > tmp_prob0_r & tmp_prob2_r > tmp_prob1_r) begin
                                 tmp_seq_w[counter_r]   = {topN_seq2_r[111:0], 3'b0, i_char[counter_r] + 1};;
-                                this_prob_w[counter_r] = tmp_prob2_w;
+                                this_prob_w[counter_r] = tmp_prob2_r;
                             end
                         end
                         counter_w = counter_r + 1;
@@ -846,8 +857,8 @@ module Viterbi (
         endcase
     end
 
-    always_ff @ (posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @ (posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             prev_char_r <= '{3{5'b0}};
             state_r <= S_IDLE;
             topN_prob0_r <= 32'b0;

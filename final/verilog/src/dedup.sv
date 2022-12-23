@@ -6,9 +6,9 @@ module Dedup (
     input [4:0] i_prev_tops[0:2],
     output o_next
 );
-    localparam S_IDLE = 0;
-    localparam S_VEC = 1;
-    localparam S_CHECK = 2;
+    localparam S_IDLE = 3'd0;
+    localparam S_VEC = 3'd1;
+    localparam S_CHECK = 3'd2;
 
     logic [2:0] state_r, state_w;
     logic [4:0] prev_vec_r, prev_vec_w;
@@ -29,7 +29,7 @@ module Dedup (
             S_IDLE: begin
                 next_w = 0;
                 if (i_next) begin
-                    state_r = S_VEC;
+                    state_w = S_VEC;
                     prev_vec_w = 0;
                     vec_w = 0;
                 end
@@ -50,8 +50,8 @@ module Dedup (
         endcase
     end
 
-    always_ff @(posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @(posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             state_r <= S_IDLE;
             prev_vec_r <= 0;
             vec_r <= 0;

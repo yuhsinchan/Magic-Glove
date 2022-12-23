@@ -17,7 +17,7 @@ module Model (
     localparam S_SORT = 3'd4;
     localparam S_DONE = 3'd5;
 
-    localparam [15:0] kernel_weights[0:9][0:23] = '{
+    localparam bit [15:0] kernel_weights[0:9][0:23] = '{
         '{
             -16'h13b2,
             -16'h15cb,
@@ -280,7 +280,7 @@ module Model (
         }
     };
 
-    localparam [15:0] cnn_bias[0:9] = '{
+    localparam bit [15:0] cnn_bias[0:9] = '{
         16'h08d8,
         16'h0b7e,
         -16'h0b01,
@@ -294,7 +294,7 @@ module Model (
     };
 
 
-    localparam [15:0] fc_weights[0:26][0:29] = '{
+    localparam bit [15:0] fc_weights[0:26][0:29] = '{
         '{
             16'h09e6,
             16'h06b3,
@@ -1161,7 +1161,7 @@ module Model (
         }
     };
 
-    localparam [15:0] fc_bias[0:26] = '{
+    localparam bit [15:0] fc_bias[0:26] = '{
         -16'h2a85,
         16'h05cc,
         16'h1ba1,
@@ -1204,8 +1204,8 @@ module Model (
         top3_char_r[0:2], top3_char_w[0:2], tmp_char_r, tmp_char_w, fc_counter_r, fc_counter_w;
     logic [1:0] sort_counter_r, sort_counter_w;
 
-    logic norm_finish[0:4];
-    logic cnn_finish [0:9];
+    logic [0:4] norm_finish;
+    logic [0:9] cnn_finish ;
     logic fc_finish;
 
     logic [2:0] state_r, state_w;
@@ -1224,28 +1224,28 @@ module Model (
     assign o_char = top3_char_r;
     assign o_finished = finish_r;
 
-    assign norm_data_T[0:4] = {
+    assign norm_data_T[0:4] = '{
         norm_data[0], norm_data[8], norm_data[16], norm_data[24], norm_data[32]
     };
-    assign norm_data_T[5:9] = {
+    assign norm_data_T[5:9] = '{
         norm_data[1], norm_data[9], norm_data[17], norm_data[25], norm_data[33]
     };
-    assign norm_data_T[10:14] = {
+    assign norm_data_T[10:14] = '{
         norm_data[2], norm_data[10], norm_data[18], norm_data[26], norm_data[34]
     };
-    assign norm_data_T[15:19] = {
+    assign norm_data_T[15:19] = '{
         norm_data[3], norm_data[11], norm_data[19], norm_data[27], norm_data[35]
     };
-    assign norm_data_T[20:24] = {
+    assign norm_data_T[20:24] = '{
         norm_data[4], norm_data[12], norm_data[20], norm_data[28], norm_data[36]
     };
-    assign norm_data_T[25:29] = {
+    assign norm_data_T[25:29] = '{
         norm_data[5], norm_data[13], norm_data[21], norm_data[29], norm_data[37]
     };
-    assign norm_data_T[30:34] = {
+    assign norm_data_T[30:34] = '{
         norm_data[6], norm_data[14], norm_data[22], norm_data[30], norm_data[38]
     };
-    assign norm_data_T[35:39] = {
+    assign norm_data_T[35:39] = '{
         norm_data[7], norm_data[15], norm_data[23], norm_data[31], norm_data[39]
     };
 

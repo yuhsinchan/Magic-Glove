@@ -60,8 +60,8 @@ module Conv(
         
     end
 
-    always_ff @ (posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @ (posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             weighted_sum0_r <= 0;
             weighted_sum1_r <= 0;
             weighted_sum2_r <= 0;

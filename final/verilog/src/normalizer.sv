@@ -7,7 +7,7 @@ module Normalizer (
     output        o_finished
 );
 
-    localparam [15:0] mean[0:7] = '{
+    localparam bit [15:0] mean[0:7] = '{
         16'h0305,
         -16'h0058,
         16'h0101,
@@ -18,7 +18,7 @@ module Normalizer (
         16'h0133
     };
 
-    localparam [15:0] std[0:7] = '{
+    localparam bit [15:0] std[0:7] = '{
         16'h01f1,
         16'h00fd,
         16'h0110,
@@ -141,8 +141,8 @@ module Normalizer (
         endcase
     end
 
-    always_ff @(posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @(posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             ext_data0_r <= 0;
             ext_data1_r <= 0;
             ext_data2_r <= 0;
