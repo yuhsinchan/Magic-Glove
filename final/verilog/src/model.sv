@@ -1475,7 +1475,7 @@ module Model (
                     tmp_prob_w = top3_prob_r[sort_counter_r];
                 end
                 if (sort_counter_r == 2'd2 | tmp_char_r == top3_char_r[sort_counter_r]) begin
-                    if (fc_counter_r < 5'd26) begin
+                    if (fc_counter_r < 5'd27) begin
                         state_w = S_FC;
                         fc_start_w = 1'b1;
                         fc_weight_w = fc_weights[fc_counter_r];

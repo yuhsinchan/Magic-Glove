@@ -5,6 +5,8 @@ module Core (
     input [15:0] i_data[0:39],
     output o_next,
     output o_finished,
+    output [7:0] o_tops[0:2],
+    output [31:0] o_logits[0:2],
     output [7:0] o_letter,
     output [119:0] o_word,
     output [3:0] o_length
@@ -53,9 +55,10 @@ module Core (
     assign o_letter = letter_r;
     assign o_word = viter_seq;
     assign o_length = seq_length_r;
-    assign top_chars0 = nn_top_chars[0];
-    assign top_chars1 = nn_top_chars[1];
-    assign top_chars2 = nn_top_chars[2];
+    assign o_tops[0] = nn_top_chars[0];
+    assign o_tops[1] = nn_top_chars[1];
+    assign o_tops[2] = nn_top_chars[2];
+    assign o_logits = nn_logits;
 
     Model NMSL (
         .i_clk(i_clk),
@@ -157,7 +160,7 @@ module Core (
                         sum_logits_w[nn_top_chars[2]] = sum_logits_r[nn_top_chars[2]] + nn_logits[2];
                         dup_count_w = dup_count_r + 1;
 
-                        if (dup_count_r > 30 & nn_top_chars[0] != 5'd26 & nn_top_chars[1] != 5'd26) begin
+                        if (dup_count_r > 30 & (nn_top_chars[0] == 5'd26 | nn_top_chars[1] == 5'd26)) begin
                             state_w = S_DTW;
                             dup_count_w = 0;
                             sum_logits_w = '{27{32'b0}};
@@ -184,12 +187,17 @@ module Core (
                     if (tmp_viter_seq_r[7:0] != 0) begin
                         seq_length_w = seq_counter_r + 1;
                         tmp_viter_seq_w = {8'b0, tmp_viter_seq_r[119:8]};
+                    end else begin
+                        finish_w = 1'b1;
+                        state_w = S_DONE;
                     end
+                    seq_counter_w = seq_counter_r + 1;
                 end else begin
-                    if (tmp_viter_seq_r[7:0] != 0) begin
-                        seq_length_w = 4'd15;
-                    end
+                    // if (tmp_viter_seq_r[7:0] != 0) begin
+                    //     seq_length_w = 4'd15;
+                    // end
                     finish_w = 1'b1;
+                    state_w = S_DONE;
                 end
             end
             S_DONE: begin
