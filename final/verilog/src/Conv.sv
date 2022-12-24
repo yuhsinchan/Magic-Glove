@@ -49,12 +49,14 @@ module Conv(
                     2'd2: begin
                         weighted_sum2_w = $signed(i_data[2])*$signed(i_kernel[0]) + $signed(i_data[3])*$signed(i_kernel[1]) + $signed(i_data[4])*$signed(i_kernel[2]) + $signed(i_data[7])*$signed(i_kernel[3]) + $signed(i_data[8])*$signed(i_kernel[4]) + $signed(i_data[9])*$signed(i_kernel[5]) + $signed(i_data[12])*$signed(i_kernel[6]) + $signed(i_data[13])*$signed(i_kernel[7]) + $signed(i_data[14])*$signed(i_kernel[8]) + $signed(i_data[17])*$signed(i_kernel[9]) + $signed(i_data[18])*$signed(i_kernel[10]) + $signed(i_data[19])*$signed(i_kernel[11]) + $signed(i_data[22])*$signed(i_kernel[12]) + $signed(i_data[23])*$signed(i_kernel[13]) + $signed(i_data[24])*$signed(i_kernel[14]) + $signed(i_data[27])*$signed(i_kernel[15]) + $signed(i_data[28])*$signed(i_kernel[16]) + $signed(i_data[29])*$signed(i_kernel[17]) + $signed(i_data[32])*$signed(i_kernel[18]) + $signed(i_data[33])*$signed(i_kernel[19]) + $signed(i_data[34])*$signed(i_kernel[20]) + $signed(i_data[37])*$signed(i_kernel[21]) + $signed(i_data[38])*$signed(i_kernel[22]) + $signed(i_data[39])*$signed(i_kernel[23]) + $signed({i_bias, 8'b0});
                         finish_w = 1'b1;
+                        state_w = S_DONE;
                     end
                 endcase
                 counter_w = counter_r + 1;
             end
             S_DONE: begin
                 finish_w = 0;
+                state_w = S_IDLE;
             end
         endcase
         

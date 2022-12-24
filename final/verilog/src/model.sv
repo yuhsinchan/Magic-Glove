@@ -1198,14 +1198,17 @@ module Model (
     logic finish_r, finish_w;
 
     logic [15:0] fc_weight_r[0:29], fc_weight_w[0:29];
+    logic [15:0] kernel_weight_r[0:23], kernel_weight_w[0:23];
+    logic [15:0] cnn_bias_r, cnn_bias_w;
+    logic [23:0] cnn_channel_output[0:2];
     logic [15:0] fc_bias_r, fc_bias_w;
     logic [31:0] top3_prob_r[0:2], top3_prob_w[0:2], tmp_prob_r, tmp_prob_w;
     logic [4:0]
-        top3_char_r[0:2], top3_char_w[0:2], tmp_char_r, tmp_char_w, fc_counter_r, fc_counter_w;
+        top3_char_r[0:2], top3_char_w[0:2], tmp_char_r, tmp_char_w, nn_counter_r, nn_counter_w;
     logic [1:0] sort_counter_r, sort_counter_w;
 
     logic [0:4] norm_finish;
-    logic [0:9] cnn_finish ;
+    logic cnn_finish;
     logic fc_finish;
 
     logic [2:0] state_r, state_w;
@@ -1213,11 +1216,11 @@ module Model (
     // logic [15:0] data[0:39];
     logic [15:0] norm_data  [0:39];
     logic [15:0] norm_data_T[0:39];
-    logic [23:0] cnn_output [0:29];
+    logic [23:0] cnn_output_r [0:29], cnn_output_w[0:29];
     logic [31:0] fc_output;
 
     assign o_norm = norm_data;
-    assign o_cnn = cnn_output;
+    assign o_cnn = cnn_output_r;
     assign o_logits[0] = {8'b0, top3_prob_r[0][31:8]};
     assign o_logits[1] = {8'b0, top3_prob_r[1][31:8]};
     assign o_logits[2] = {8'b0, top3_prob_r[2][31:8]};
@@ -1295,114 +1298,15 @@ module Model (
     );
 
 
-    Conv conv0 (
+    Conv conv (
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
         .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[0]),
+        .i_kernel(kernel_weight_r),
         .i_data(norm_data_T),
-        .i_bias(cnn_bias[0]),
-        .o_weights(cnn_output[0:2]),
-        .o_finished(cnn_finish[0])
-    );
-
-    Conv conv1 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[1]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[1]),
-        .o_weights(cnn_output[3:5]),
-        .o_finished(cnn_finish[1])
-    );
-
-    Conv conv2 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[2]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[2]),
-        .o_weights(cnn_output[6:8]),
-        .o_finished(cnn_finish[2])
-    );
-
-    Conv conv3 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[3]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[3]),
-        .o_weights(cnn_output[9:11]),
-        .o_finished(cnn_finish[3])
-    );
-
-    Conv conv4 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[4]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[4]),
-        .o_weights(cnn_output[12:14]),
-        .o_finished(cnn_finish[4])
-    );
-
-    Conv conv5 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[5]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[5]),
-        .o_weights(cnn_output[15:17]),
-        .o_finished(cnn_finish[5])
-    );
-
-    Conv conv6 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[6]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[6]),
-        .o_weights(cnn_output[18:20]),
-        .o_finished(cnn_finish[6])
-    );
-
-    Conv conv7 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[7]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[7]),
-        .o_weights(cnn_output[21:23]),
-        .o_finished(cnn_finish[7])
-    );
-
-    Conv conv8 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[8]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[8]),
-        .o_weights(cnn_output[24:26]),
-        .o_finished(cnn_finish[8])
-    );
-
-    Conv conv9 (
-        .i_clk(i_clk),
-        .i_rst_n(i_rst_n),
-        .i_start(cnn_start_r),
-        .i_kernel(kernel_weights[9]),
-        .i_data(norm_data_T),
-        .i_bias(cnn_bias[9]),
-        .o_weights(cnn_output[27:29]),
-        .o_finished(cnn_finish[9])
+        .i_bias(cnn_bias_r),
+        .o_weights(cnn_channel_output),
+        .o_finished(cnn_finish)
     );
 
     FC fc (
@@ -1410,7 +1314,7 @@ module Model (
         .i_rst_n(i_rst_n),
         .i_start(fc_start_r),
         .i_weight(fc_weight_r),
-        .i_data(cnn_output),
+        .i_data(cnn_output_r),
         .i_bias(fc_bias_r),
         .o_output(fc_output),
         .o_finished(fc_finish)
@@ -1428,8 +1332,11 @@ module Model (
         top3_prob_w = top3_prob_r;
         tmp_char_w = tmp_char_r;
         tmp_prob_w = tmp_prob_r;
-        fc_counter_w = fc_counter_r;
+        nn_counter_w = nn_counter_r;
         sort_counter_w = sort_counter_r;
+        kernel_weight_w = kernel_weight_r;
+        cnn_bias_w = cnn_bias_r;
+        cnn_output_w = cnn_output_r;
 
         case (state_r)
             S_IDLE: begin
@@ -1445,26 +1352,38 @@ module Model (
                 if (norm_finish == {5{1'b1}}) begin
                     state_w = S_CONV;
                     cnn_start_w = 1'b1;
+                    nn_counter_w = 0;
+                    kernel_weight_w = kernel_weights[0];
+                    cnn_bias_w = cnn_bias[0];
                 end
             end
             S_CONV: begin
                 cnn_start_w = 1'b0;
-                if (cnn_finish == {10{1'b1}}) begin
-                    state_w = S_FC;
-                    fc_start_w = 1'b1;
-                    fc_weight_w = fc_weights[0];
-                    fc_bias_w = fc_bias[0];
-                    fc_counter_w = 5'd0;
+                if (cnn_finish == 1'b1) begin
+                    if (nn_counter_r < 5'd9) begin
+                        cnn_output_w[nn_counter_r*3+:3] = cnn_channel_output;
+                        kernel_weight_w = kernel_weights[nn_counter_r+1];
+                        cnn_bias_w = cnn_bias_r[nn_counter_r+1];
+                        nn_counter_w = nn_counter_r + 1;
+                        cnn_start_w = 1'b1;
+                    end else begin
+                        cnn_output_w[27:29] = cnn_channel_output;
+                        fc_start_w = 1'b1;
+                        state_w = S_FC;
+                        fc_weight_w = fc_weights[0];
+                        fc_bias_w = fc_bias[0];
+                        nn_counter_w = 5'd0;
+                    end
                 end
             end
             S_FC: begin
                 fc_start_w = 1'b0;
                 if (fc_finish == 1'b1) begin
                     state_w = S_SORT;
-                    tmp_char_w = fc_counter_r;
+                    tmp_char_w = nn_counter_r;
                     tmp_prob_w = fc_output;
                     sort_counter_w = 2'b0;
-                    fc_counter_w = fc_counter_r + 1;
+                    nn_counter_w = nn_counter_r + 1;
                 end
             end
             S_SORT: begin
@@ -1475,11 +1394,11 @@ module Model (
                     tmp_prob_w = top3_prob_r[sort_counter_r];
                 end
                 if (sort_counter_r == 2'd2 | tmp_char_r == top3_char_r[sort_counter_r]) begin
-                    if (fc_counter_r < 5'd27) begin
+                    if (nn_counter_r < 5'd27) begin
                         state_w = S_FC;
                         fc_start_w = 1'b1;
-                        fc_weight_w = fc_weights[fc_counter_r];
-                        fc_bias_w = fc_bias[fc_counter_r];
+                        fc_weight_w = fc_weights[nn_counter_r];
+                        fc_bias_w = fc_bias[nn_counter_r];
                     end else begin
                         state_w  = S_DONE;
                         finish_w = 1'b1;
@@ -1507,8 +1426,11 @@ module Model (
             top3_prob_r <= '{0, 0, 0};
             tmp_char_r <= 0;
             tmp_prob_r <= 0;
-            fc_counter_r <= 0;
+            nn_counter_r <= 0;
             sort_counter_r <= 0;
+            kernel_weight_r <= '{24{1'b0}};
+            cnn_bias_r <= 0;
+            cnn_output_r <= '{30{1'b0}};
         end else begin
             norm_start_r <= norm_start_w;
             cnn_start_r <= cnn_start_w;
@@ -1521,8 +1443,11 @@ module Model (
             top3_prob_r <= top3_prob_w;
             tmp_char_r <= tmp_char_w;
             tmp_prob_r <= tmp_prob_w;
-            fc_counter_r <= fc_counter_w;
+            nn_counter_r <= nn_counter_w;
             sort_counter_r <= sort_counter_w;
+            kernel_weight_r <= kernel_weight_w;
+            cnn_bias_r <= cnn_bias_w;
+            cnn_output_r <= cnn_output_w;
         end
     end
 endmodule
