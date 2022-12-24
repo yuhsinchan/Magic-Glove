@@ -1436,6 +1436,8 @@ module Model (
                 if (i_start) begin
                     state_w = S_PREP;
                     norm_start_w = 1'b1;
+                    top3_char_w = '{3{5'b0}};
+                    top3_prob_w = '{3{32'b0}};
                 end
             end
             S_PREP: begin
@@ -1472,7 +1474,7 @@ module Model (
                     tmp_char_w = top3_char_r[sort_counter_r];
                     tmp_prob_w = top3_prob_r[sort_counter_r];
                 end
-                if (sort_counter_r == 2'd2) begin
+                if (sort_counter_r == 2'd2 | tmp_char_r == top3_char_r[sort_counter_r]) begin
                     if (fc_counter_r < 5'd26) begin
                         state_w = S_FC;
                         fc_start_w = 1'b1;
@@ -1492,8 +1494,8 @@ module Model (
         endcase
     end
 
-    always_ff @(posedge i_clk or negedge i_rst_n) begin
-        if (!i_rst_n) begin
+    always_ff @(posedge i_clk or posedge i_rst_n) begin
+        if (i_rst_n) begin
             norm_start_r <= 0;
             cnn_start_r <= 0;
             fc_start_r <= 0;

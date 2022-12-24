@@ -28,6 +28,7 @@ module Core (
     logic [31:0] sum_logits_r[0:26], sum_logits_w[0:26];
     logic [31:0] avg_logits_r[0:2], avg_logits_w[0:2];
     logic [6:0] dup_count_r, dup_count_w;
+    logic dup_finish;
 
     logic viter_start_r, viter_start_w;
     logic viter_next_r, viter_next_w;
@@ -44,12 +45,17 @@ module Core (
     logic [74:0] word_r, word_w;
     logic [15:0] data_r[0:39], data_w[0:39];
     logic no_dup;
+        
+    logic [4:0] top_chars0, top_chars1, top_chars2;
 
     assign o_next = next_r;
     assign o_finished = finish_r;
     assign o_letter = letter_r;
     assign o_word = viter_seq;
     assign o_length = seq_length_r;
+    assign top_chars0 = nn_top_chars[0];
+    assign top_chars1 = nn_top_chars[1];
+    assign top_chars2 = nn_top_chars[2];
 
     Model NMSL (
         .i_clk(i_clk),
@@ -67,6 +73,7 @@ module Core (
         .i_tops(nn_top_chars),
         .i_prev_tops(pre_top_chars_r),
         .i_next(nn_finish),
+        .o_finished(dup_finish),
         .o_next(no_dup)
     );
 
@@ -114,47 +121,57 @@ module Core (
                 end
             end
             S_NN: begin
+                nn_start_w = 1'b0;
                 if (nn_finish) begin
                     state_w = S_DEDUP;
                 end
             end
             S_DEDUP: begin
-                if (no_dup) begin
-                    if (dup_count_r > 5 & pre_top_chars_r[0] != 5'd26 & pre_top_chars_r[1] != 5'd26) begin
-                        // new letter
-                        avg_logits_w[0] = sum_logits_w[pre_top_chars_r[0]] / dup_count_r;
-                        avg_logits_w[1] = sum_logits_w[pre_top_chars_r[1]] / dup_count_r;
-                        avg_logits_w[2] = sum_logits_w[pre_top_chars_r[2]] / dup_count_r;
-                        sum_logits_w[nn_top_chars[0]] = nn_logits[0];
-                        sum_logits_w[nn_top_chars[1]] = nn_logits[1];
-                        sum_logits_w[nn_top_chars[2]] = nn_logits[2];
-                        state_w = S_VITER;
-                    end else begin
-                        // skip
-                        sum_logits_w = '{27{32'b0}};
-                        state_w = S_IDLE;
+                if (dup_finish) begin
+                    if (no_dup) begin
+                        if (dup_count_r > 5 & pre_top_chars_r[0] != 5'd26 & pre_top_chars_r[1] != 5'd26) begin
+                            // new letter
+                            avg_logits_w[0] = sum_logits_w[pre_top_chars_r[0]] / dup_count_r;
+                            avg_logits_w[1] = sum_logits_w[pre_top_chars_r[1]] / dup_count_r;
+                            avg_logits_w[2] = sum_logits_w[pre_top_chars_r[2]] / dup_count_r;
+                            sum_logits_w[nn_top_chars[0]] = nn_logits[0];
+                            sum_logits_w[nn_top_chars[1]] = nn_logits[1];
+                            sum_logits_w[nn_top_chars[2]] = nn_logits[2];
+                            state_w = S_VITER;
+                            if (viter_seq == 0) begin
+                                viter_start_w = 1'b1;
+                            end else begin
+                                viter_next_w = 1'b1;
+                            end
+                        end else begin
+                            // skip
+                            sum_logits_w = '{27{32'b0}};
+                            state_w = S_IDLE;
+                            dup_count_w = 7'b0;
+                            pre_top_chars_w = nn_top_chars;
+                        end
                         dup_count_w = 7'b0;
-                        pre_top_chars_w = nn_top_chars;
-                    end
-                    dup_count_w = 7'b0;
-                end else begin
-                    sum_logits_w[nn_top_chars[0]] = sum_logits_r[nn_top_chars[0]] + nn_logits[0];
-                    sum_logits_w[nn_top_chars[1]] = sum_logits_r[nn_top_chars[1]] + nn_logits[1];
-                    sum_logits_w[nn_top_chars[2]] = sum_logits_r[nn_top_chars[2]] + nn_logits[2];
-                    dup_count_w = dup_count_r + 1;
-
-                    if (dup_count_r > 30 & nn_top_chars[0] != 5'd26 & nn_top_chars[1] != 5'd26) begin
-                        state_w = S_DTW;
-                        dup_count_w = 0;
-                        sum_logits_w = '{27{32'b0}};
-                        seq_counter_w = 0;
-                        tmp_viter_seq_w = viter_seq;
                     end else begin
-                        state_w = S_IDLE;
+                        sum_logits_w[nn_top_chars[0]] = sum_logits_r[nn_top_chars[0]] + nn_logits[0];
+                        sum_logits_w[nn_top_chars[1]] = sum_logits_r[nn_top_chars[1]] + nn_logits[1];
+                        sum_logits_w[nn_top_chars[2]] = sum_logits_r[nn_top_chars[2]] + nn_logits[2];
+                        dup_count_w = dup_count_r + 1;
+
+                        if (dup_count_r > 30 & nn_top_chars[0] != 5'd26 & nn_top_chars[1] != 5'd26) begin
+                            state_w = S_DTW;
+                            dup_count_w = 0;
+                            sum_logits_w = '{27{32'b0}};
+                            seq_counter_w = 0;
+                            tmp_viter_seq_w = viter_seq;
+                        end else begin
+                            state_w = S_IDLE;
+                        end
                     end
                 end
             end
             S_VITER: begin
+                viter_start_w = 1'b0;
+                viter_next_w = 1'b0;
                 if (viter_stepped) begin
                     pre_top_chars_w = nn_top_chars;
                     letter_w = viter_seq[7:0];
@@ -205,6 +222,28 @@ module Core (
             data_r <= '{40{16'b0}};
 
             state_r <= S_IDLE;
+        end else begin
+            nn_start_r = nn_start_w;
+            pre_top_chars_r = pre_top_chars_w;
+
+            sum_logits_r = sum_logits_w;
+            avg_logits_r = avg_logits_w;
+            dup_count_r = dup_count_w;
+
+            viter_start_r = viter_start_w;
+            viter_next_r = viter_next_w;
+
+            seq_length_r = seq_length_w;
+            seq_counter_r = seq_counter_w;
+            tmp_viter_seq_r = tmp_viter_seq_w;
+
+            next_r = next_w;
+            finish_r = finish_w;
+            letter_r = letter_w;
+            word_r = word_w;
+            data_r = data_w;
+
+            state_r = state_w;
         end
     end
 

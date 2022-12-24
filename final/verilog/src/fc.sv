@@ -8,9 +8,9 @@ module FC(
     output [31:0] o_output,
     output o_finished
 );
-    localparam S_IDLE = 0;
-    localparam S_CALC = 1;
-    localparam S_DONE = 2;
+    localparam S_IDLE = 2'd0;
+    localparam S_CALC = 2'd1;
+    localparam S_DONE = 2'd2;
 
     logic [1:0] state_r, state_w;
     logic [39:0] weighted_sum_r, weighted_sum_w;
