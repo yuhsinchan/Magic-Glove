@@ -587,7 +587,6 @@ module similarity(
 				end
 			end
 			S_CALC: begin
-
                 interger ptr_word;
                 interger charac;
                 initial begin
