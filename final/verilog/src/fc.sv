@@ -13,7 +13,7 @@ module FC(
     localparam S_DONE = 2'd2;
 
     logic [1:0] state_r, state_w;
-    logic [39:0] weighted_sum_r, weighted_sum_w;
+    logic signed [39:0] weighted_sum_r, weighted_sum_w;
     logic finish_r, finish_w;
 
     assign o_output = weighted_sum_r[39:8];

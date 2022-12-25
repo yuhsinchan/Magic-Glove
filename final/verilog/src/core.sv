@@ -24,18 +24,19 @@ module Core (
     logic nn_start_r, nn_start_w;
     logic [4:0] pre_top_chars_r[0:2], pre_top_chars_w[0:2];
     logic nn_finish;
-    logic [31:0] nn_logits[0:2];
+    logic signed [31:0] nn_logits[0:2];
     logic [4:0] nn_top_chars[0:2];
 
-    logic [31:0] sum_logits_r[0:26], sum_logits_w[0:26];
-    logic [31:0] avg_logits_r[0:2], avg_logits_w[0:2];
+    logic signed [31:0] sum_logits_r[0:26], sum_logits_w[0:26];
+    logic signed [31:0] avg_logits_r[0:2], avg_logits_w[0:2];
     logic [6:0] dup_count_r, dup_count_w;
     logic dup_finish;
 
     logic viter_start_r, viter_start_w;
     logic viter_next_r, viter_next_w;
     logic viter_stepped;
-	 logic [119:0] viter_seq;
+    logic [119:0] viter_seq;
+    logic [4:0] viter_o_char;
 
     logic [3:0] seq_length_r, seq_length_w;
     logic [3:0] seq_counter_r, seq_counter_w;
@@ -45,16 +46,16 @@ module Core (
     logic finish_r, finish_w;
     logic [7:0] letter_r, letter_w;
     logic [74:0] word_r, word_w;
-    logic [15:0] data_r[0:39], data_w[0:39];
+    logic signed [15:0] data_r[0:39], data_w[0:39];
     logic no_dup;
         
     logic [4:0] top_chars0, top_chars1, top_chars2;
 
     assign o_next = next_r;
     assign o_finished = finish_r;
-    assign o_letter = letter_r;
+    assign o_letter = viter_o_char;
     assign o_word = viter_seq;
-    assign o_length = seq_length_r;
+    assign o_length = 3'd4;
     assign o_tops[0] = nn_top_chars[0];
     assign o_tops[1] = nn_top_chars[1];
     assign o_tops[2] = nn_top_chars[2];
@@ -87,6 +88,7 @@ module Core (
         .i_next(viter_next_r),
         .i_prob(avg_logits_r),
         .i_char(pre_top_chars_r),
+        .o_char(viter_o_char),
         .o_seq(viter_seq),
         .o_stepped(viter_stepped)
     );
@@ -117,6 +119,7 @@ module Core (
         case (state_r)
             S_IDLE: begin
                 next_w = 1'b0;
+                finish_w = 1'b0;
                 if (i_next) begin
                     state_w = S_NN;
                     nn_start_w = 1'b1;
@@ -127,12 +130,14 @@ module Core (
                 nn_start_w = 1'b0;
                 if (nn_finish) begin
                     state_w = S_DEDUP;
+                    // next_w = 1'b1;
+                    // finish_w = 1'b1;
                 end
             end
             S_DEDUP: begin
                 if (dup_finish) begin
                     if (no_dup) begin
-                        if (dup_count_r > 5 & pre_top_chars_r[0] != 5'd26 & pre_top_chars_r[1] != 5'd26) begin
+                        if (dup_count_r > 5 && pre_top_chars_r[0] != 5'd26 & pre_top_chars_r[1] != 5'd26) begin
                             // new letter
                             avg_logits_w[0] = sum_logits_w[pre_top_chars_r[0]] / dup_count_r;
                             avg_logits_w[1] = sum_logits_w[pre_top_chars_r[1]] / dup_count_r;
@@ -152,6 +157,7 @@ module Core (
                             state_w = S_IDLE;
                             dup_count_w = 7'b0;
                             pre_top_chars_w = nn_top_chars;
+                            // next_w = 1'b1;
                         end
                         dup_count_w = 7'b0;
                     end else begin
@@ -160,7 +166,7 @@ module Core (
                         sum_logits_w[nn_top_chars[2]] = sum_logits_r[nn_top_chars[2]] + nn_logits[2];
                         dup_count_w = dup_count_r + 1;
 
-                        if (dup_count_r > 30 & (nn_top_chars[0] == 5'd26 | nn_top_chars[1] == 5'd26)) begin
+                        if (dup_count_r > 30 && (nn_top_chars[0] == 5'd26 | nn_top_chars[1] == 5'd26)) begin
                             state_w = S_DTW;
                             dup_count_w = 0;
                             sum_logits_w = '{27{32'b0}};
@@ -168,6 +174,7 @@ module Core (
                             tmp_viter_seq_w = viter_seq;
                         end else begin
                             state_w = S_IDLE;
+                            // next_w = 1'b1;
                         end
                     end
                 end
@@ -184,7 +191,7 @@ module Core (
             end
             S_DTW: begin
                 if (seq_counter_r < 4'd15) begin
-                    if (tmp_viter_seq_r[7:0] != 0) begin
+                    if (tmp_viter_seq_r[4:0] != 0) begin
                         seq_length_w = seq_counter_r + 1;
                         tmp_viter_seq_w = {8'b0, tmp_viter_seq_r[119:8]};
                     end else begin
@@ -231,27 +238,27 @@ module Core (
 
             state_r <= S_IDLE;
         end else begin
-            nn_start_r = nn_start_w;
-            pre_top_chars_r = pre_top_chars_w;
+            nn_start_r <= nn_start_w;
+            pre_top_chars_r <= pre_top_chars_w;
 
-            sum_logits_r = sum_logits_w;
-            avg_logits_r = avg_logits_w;
-            dup_count_r = dup_count_w;
+            sum_logits_r <= sum_logits_w;
+            avg_logits_r <= avg_logits_w;
+            dup_count_r <= dup_count_w;
 
-            viter_start_r = viter_start_w;
-            viter_next_r = viter_next_w;
+            viter_start_r <= viter_start_w;
+            viter_next_r <= viter_next_w;
 
-            seq_length_r = seq_length_w;
-            seq_counter_r = seq_counter_w;
-            tmp_viter_seq_r = tmp_viter_seq_w;
+            seq_length_r <= seq_length_w;
+            seq_counter_r <= seq_counter_w;
+            tmp_viter_seq_r <= tmp_viter_seq_w;
 
-            next_r = next_w;
-            finish_r = finish_w;
-            letter_r = letter_w;
-            word_r = word_w;
-            data_r = data_w;
+            next_r <= next_w;
+            finish_r <= finish_w;
+            letter_r <= letter_w;
+            word_r <= word_w;
+            data_r <= data_w;
 
-            state_r = state_w;
+            state_r <= state_w;
         end
     end
 

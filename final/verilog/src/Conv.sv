@@ -12,9 +12,9 @@ module Conv(
     localparam S_CALC = 1;
     localparam S_DONE = 2;
 
-    logic [31:0] weighted_sum0_r, weighted_sum0_w;
-    logic [31:0] weighted_sum1_r, weighted_sum1_w;
-    logic [31:0] weighted_sum2_r, weighted_sum2_w;
+    logic signed [31:0] weighted_sum0_r, weighted_sum0_w;
+    logic signed [31:0] weighted_sum1_r, weighted_sum1_w;
+    logic signed [31:0] weighted_sum2_r, weighted_sum2_w;
     logic [1:0] counter_r, counter_w;
     logic [1:0] state_r, state_w;
     logic finish_r, finish_w;

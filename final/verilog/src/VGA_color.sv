@@ -38,6 +38,7 @@ parameter ROW_DIST = 20;
 
 
 // pattern number declare here
+parameter PAT_TEST  = 8'd0;
 parameter PAT_LOW_a = 8'd1;
 parameter PAT_LOW_b = 8'd2;
 parameter PAT_LOW_c = 8'd3;
@@ -104,6 +105,7 @@ _ o o o o
 o _ _ _ o
 _ o o o o
 ************/
+parameter [34:0] pattern_test    = {35'b00000000011111111111111111111110000};
 parameter [34:0] pattern_space   = {35'b00000000000000000000000000000000000};
 parameter [34:0] pattern_lower_a = {35'b00000000000111000001011111000101111};
 parameter [34:0] pattern_lower_b = {35'b10000100001011011001100011000111110};
@@ -248,6 +250,10 @@ always_comb begin
         color_w = BLACK;
     end else begin
         case(i_letters[row][column])
+            PAT_TEST: begin
+                check_display(pattern_test, cali_x_pos, cali_y_pos, PIXEL_LEN, PIXEL_DIST, is_color);
+                color_w = is_color ? WHITE : BLACK;
+            end
             PAT_space: begin
                 check_display(pattern_space, cali_x_pos, cali_y_pos, PIXEL_LEN, PIXEL_DIST, is_color);
                 color_w = is_color ? WHITE : BLACK;
@@ -470,10 +476,6 @@ end
 always_ff @( posedge i_clk or posedge i_rst ) begin
     if (i_rst) begin
         color_r <= 23'b0;
-    // end else if (i_next) begin
-    //     cur_offset_x_r <= INIT_OFFSET_X;
-    //     cur_offset_y_r <= INIT_OFFSET_Y;
-    //     cur_number_r <= 0;
     end else begin
         color_r <= color_w;
     end

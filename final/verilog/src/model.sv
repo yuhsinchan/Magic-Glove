@@ -17,7 +17,7 @@ module Model (
     localparam S_SORT = 3'd4;
     localparam S_DONE = 3'd5;
 
-    localparam bit [15:0] kernel_weights[0:9][0:23] = '{
+    localparam bit signed [15:0] kernel_weights[0:9][0:23] = '{
         '{
             -16'h13b2,
             -16'h15cb,
@@ -280,7 +280,7 @@ module Model (
         }
     };
 
-    localparam bit [15:0] cnn_bias[0:9] = '{
+    localparam bit signed [15:0] cnn_bias[0:9] = '{
         16'h08d8,
         16'h0b7e,
         -16'h0b01,
@@ -294,7 +294,7 @@ module Model (
     };
 
 
-    localparam bit [15:0] fc_weights[0:26][0:29] = '{
+    localparam bit signed [15:0] fc_weights[0:26][0:29] = '{
         '{
             16'h09e6,
             16'h06b3,
@@ -1161,7 +1161,7 @@ module Model (
         }
     };
 
-    localparam bit [15:0] fc_bias[0:26] = '{
+    localparam bit signed [15:0] fc_bias[0:26] = '{
         -16'h2a85,
         16'h05cc,
         16'h1ba1,
@@ -1197,12 +1197,12 @@ module Model (
     logic fc_start_r, fc_start_w;
     logic finish_r, finish_w;
 
-    logic [15:0] fc_weight_r[0:29], fc_weight_w[0:29];
-    logic [15:0] kernel_weight_r[0:23], kernel_weight_w[0:23];
-    logic [15:0] cnn_bias_r, cnn_bias_w;
-    logic [23:0] cnn_channel_output[0:2];
-    logic [15:0] fc_bias_r, fc_bias_w;
-    logic [31:0] top3_prob_r[0:2], top3_prob_w[0:2], tmp_prob_r, tmp_prob_w;
+    logic signed [15:0] fc_weight_r[0:29], fc_weight_w[0:29];
+    logic signed [15:0] kernel_weight_r[0:23], kernel_weight_w[0:23];
+    logic signed [15:0] cnn_bias_r, cnn_bias_w;
+    logic signed [23:0] cnn_channel_output[0:2];
+    logic signed [15:0] fc_bias_r, fc_bias_w;
+    logic signed [31:0] top3_prob_r[0:2], top3_prob_w[0:2], tmp_prob_r, tmp_prob_w;
     logic [4:0]
         top3_char_r[0:2], top3_char_w[0:2], tmp_char_r, tmp_char_w, nn_counter_r, nn_counter_w;
     logic [1:0] sort_counter_r, sort_counter_w;
@@ -1214,18 +1214,21 @@ module Model (
     logic [2:0] state_r, state_w;
 
     // logic [15:0] data[0:39];
-    logic [15:0] norm_data  [0:39];
-    logic [15:0] norm_data_T[0:39];
-    logic [23:0] cnn_output_r [0:29], cnn_output_w[0:29];
-    logic [31:0] fc_output;
+    logic signed [15:0] norm_data  [0:39];
+    logic signed [15:0] norm_data_T[0:39];
+    logic signed [23:0] cnn_output_r [0:29], cnn_output_w[0:29];
+    logic signed [31:0] fc_output;
 
-    assign o_norm = norm_data;
-    assign o_cnn = cnn_output_r;
-    assign o_logits[0] = {8'b0, top3_prob_r[0][31:8]};
-    assign o_logits[1] = {8'b0, top3_prob_r[1][31:8]};
-    assign o_logits[2] = {8'b0, top3_prob_r[2][31:8]};
+    // assign o_norm = norm_data;
+    // assign o_cnn = cnn_output_r;
+    assign o_logits[0] = top3_prob_r[0][31:8] >>> 8;
+    assign o_logits[1] = top3_prob_r[1][31:8] >>> 8;
+    assign o_logits[2] = top3_prob_r[2][31:8] >>> 8;
     assign o_char = top3_char_r;
     assign o_finished = finish_r;
+    // assign o_char[0] = norm_data_T[0][3:0];
+    // assign o_char[1] = norm_data_T[1][3:0];
+    // assign o_char[2] = norm_data_T[2][3:0];
 
     assign norm_data_T[0:4] = '{
         norm_data[0], norm_data[8], norm_data[16], norm_data[24], norm_data[32]
@@ -1354,24 +1357,63 @@ module Model (
                     cnn_start_w = 1'b1;
                     nn_counter_w = 0;
                     kernel_weight_w = kernel_weights[0];
-                    cnn_bias_w = cnn_bias[0];
+                    cnn_bias_w = $signed(cnn_bias[0]);
+
+                    // debug
+                    // top3_char_w[0] = norm_data[0][3:0];
+                    // top3_char_w[1] = norm_data[1][3:0];
+                    // top3_char_w[2] = norm_data[2][3:0];
+                    // state_w = S_DONE;
+                    // finish_w = 1;
                 end
             end
             S_CONV: begin
                 cnn_start_w = 1'b0;
                 if (cnn_finish == 1'b1) begin
                     if (nn_counter_r < 5'd9) begin
-                        cnn_output_w[nn_counter_r*3+:3] = cnn_channel_output;
+                        case (nn_counter_r)
+                            0: begin
+                                cnn_output_w[0:2] = cnn_channel_output;
+                            end
+                            1: begin
+                                cnn_output_w[3:5] = cnn_channel_output;
+                            end
+                            2: begin
+                                cnn_output_w[6:8] = cnn_channel_output;
+                            end
+                            3: begin
+                                cnn_output_w[9:11] = cnn_channel_output;
+                            end
+                            4: begin
+                                cnn_output_w[12:14] = cnn_channel_output;
+                            end
+                            5: begin
+                                cnn_output_w[15:17] = cnn_channel_output;
+                            end
+                            6: begin
+                                cnn_output_w[18:20] = cnn_channel_output;
+                            end
+                            7: begin
+                                cnn_output_w[21:23] = cnn_channel_output;
+                            end
+                            8: begin
+                                cnn_output_w[24:26] = cnn_channel_output;
+                            end
+                            9: begin
+                                cnn_output_w[27:29] = cnn_channel_output;
+                            end
+                        endcase
                         kernel_weight_w = kernel_weights[nn_counter_r+1];
-                        cnn_bias_w = cnn_bias_r[nn_counter_r+1];
+                        cnn_bias_w = $signed(cnn_bias_r[nn_counter_r+1]);
                         nn_counter_w = nn_counter_r + 1;
                         cnn_start_w = 1'b1;
-                    end else begin
+                    end 
+                    else begin
                         cnn_output_w[27:29] = cnn_channel_output;
                         fc_start_w = 1'b1;
                         state_w = S_FC;
                         fc_weight_w = fc_weights[0];
-                        fc_bias_w = fc_bias[0];
+                        fc_bias_w = $signed(fc_bias[0]);
                         nn_counter_w = 5'd0;
                     end
                 end
@@ -1388,17 +1430,18 @@ module Model (
             end
             S_SORT: begin
                 if ($signed(tmp_prob_r) > $signed(top3_prob_r[sort_counter_r])) begin
+                // if ($signed(tmp_prob_r) > 0) begin
                     top3_char_w[sort_counter_r] = tmp_char_r;
-                    top3_prob_w[sort_counter_r] = tmp_prob_r;
+                    top3_prob_w[sort_counter_r] = $signed(tmp_prob_r);
                     tmp_char_w = top3_char_r[sort_counter_r];
-                    tmp_prob_w = top3_prob_r[sort_counter_r];
+                    tmp_prob_w = $signed(top3_prob_r[sort_counter_r]);
                 end
-                if (sort_counter_r == 2'd2 | tmp_char_r == top3_char_r[sort_counter_r]) begin
+                if (sort_counter_r == 2'd2 || (tmp_char_r == top3_char_r[sort_counter_r])) begin
                     if (nn_counter_r < 5'd27) begin
                         state_w = S_FC;
                         fc_start_w = 1'b1;
                         fc_weight_w = fc_weights[nn_counter_r];
-                        fc_bias_w = fc_bias[nn_counter_r];
+                        fc_bias_w = $signed(fc_bias[nn_counter_r]);
                     end else begin
                         state_w  = S_DONE;
                         finish_w = 1'b1;
