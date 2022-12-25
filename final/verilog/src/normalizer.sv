@@ -107,14 +107,24 @@ module Normalizer (
                 end
             end
             S_EXTD: begin
-                ext_data0_w = {$signed(i_data[0]) - $signed(mean[0]), 8'b0};
-                ext_data1_w = {$signed(i_data[1]) - $signed(mean[1]), 8'b0};
-                ext_data2_w = {$signed(i_data[2]) - $signed(mean[2]), 8'b0};
-                ext_data3_w = {$signed(i_data[3]) - $signed(mean[3]), 8'b0};
-                ext_data4_w = {$signed(i_data[4]) - $signed(mean[4]), 8'b0};
-                ext_data5_w = {$signed(i_data[5]) - $signed(mean[5]), 8'b0};
-                ext_data6_w = {$signed(i_data[6]) - $signed(mean[6]), 8'b0};
-                ext_data7_w = {$signed(i_data[7]) - $signed(mean[7]), 8'b0};
+                // ext_data0_w = {$signed(i_data[0]) - $signed(mean[0]), 8'b0};
+                // ext_data1_w = {$signed(i_data[1]) - $signed(mean[1]), 8'b0};
+                // ext_data2_w = {$signed(i_data[2]) - $signed(mean[2]), 8'b0};
+                // ext_data3_w = {$signed(i_data[3]) - $signed(mean[3]), 8'b0};
+                // ext_data4_w = {$signed(i_data[4]) - $signed(mean[4]), 8'b0};
+                // ext_data5_w = {$signed(i_data[5]) - $signed(mean[5]), 8'b0};
+                // ext_data6_w = {$signed(i_data[6]) - $signed(mean[6]), 8'b0};
+                // ext_data7_w = {$signed(i_data[7]) - $signed(mean[7]), 8'b0};
+
+                ext_data0_w = ($signed(i_data[0]) - $signed(mean[0])) << 8;
+                ext_data1_w = ($signed(i_data[1]) - $signed(mean[1])) << 8;
+                ext_data2_w = ($signed(i_data[2]) - $signed(mean[2])) << 8;
+                ext_data3_w = ($signed(i_data[3]) - $signed(mean[3])) << 8;
+                ext_data4_w = ($signed(i_data[4]) - $signed(mean[4])) << 8;
+                ext_data5_w = ($signed(i_data[5]) - $signed(mean[5])) << 8;
+                ext_data6_w = ($signed(i_data[6]) - $signed(mean[6])) << 8;
+                ext_data7_w = ($signed(i_data[7]) - $signed(mean[7])) << 8;
+
                 // ext_data0_w = {i_data[0]};
                 // ext_data1_w = {i_data[1]};
                 // ext_data2_w = {i_data[2]};
@@ -126,30 +136,31 @@ module Normalizer (
                 state_w = S_CALC;
             end
             S_CALC: begin
-                ext_norm0_w = ($signed(ext_data0_r) > 0) ? (ext_data0_r / std[0]) :
-                    -(-ext_data0_r / std[0]);
-                ext_norm1_w = ($signed(ext_data1_r) > 0) ? (ext_data1_r / std[1]) :
-                    -(-ext_data1_r / std[1]);
-                ext_norm2_w = ($signed(ext_data2_r) > 0) ? (ext_data2_r / std[2]) :
-                    -(-ext_data2_r / std[2]);
-                ext_norm3_w = ($signed(ext_data3_r) > 0) ? (ext_data3_r / std[3]) :
-                    -(-ext_data3_r / std[3]);
-                ext_norm4_w = ($signed(ext_data4_r) > 0) ? (ext_data4_r / std[4]) :
-                    -(-ext_data4_r / std[4]);
-                ext_norm5_w = ($signed(ext_data5_r) > 0) ? (ext_data5_r / std[5]) :
-                    -(-ext_data5_r / std[5]);
-                ext_norm6_w = ($signed(ext_data6_r) > 0) ? (ext_data6_r / std[6]) :
-                    -(-ext_data6_r / std[6]);
-                ext_norm7_w = ($signed(ext_data7_r) > 0) ? (ext_data7_r / std[7]) :
-                    -(-ext_data7_r / std[7]);
-                // ext_norm0_w = ($signed(ext_data0_r) / $signed(std[0]));
-                // ext_norm1_w = ($signed(ext_data1_r) / $signed(std[1]));
-                // ext_norm2_w = ($signed(ext_data2_r) / $signed(std[2]));
-                // ext_norm3_w = ($signed(ext_data3_r) / $signed(std[3]));
-                // ext_norm4_w = ($signed(ext_data4_r) / $signed(std[4]));
-                // ext_norm5_w = ($signed(ext_data5_r) / $signed(std[5]));
-                // ext_norm6_w = ($signed(ext_data6_r) / $signed(std[6]));
-                // ext_norm7_w = ($signed(ext_data7_r) / $signed(std[7]));
+                // ext_norm0_w = ($signed(ext_data0_r) > 0) ? (ext_data0_r / std[0]) :
+                //                                                                 -(-ext_data0_r / std[0]);
+                // ext_norm1_w = ($signed(ext_data1_r) > 0) ? (ext_data1_r / std[1]) :
+                //                                                                 -(-ext_data1_r / std[1]);
+                // ext_norm2_w = ($signed(ext_data2_r) > 0) ? (ext_data2_r / std[2]) :
+                //                                                                 -(-ext_data2_r / std[2]);
+                // ext_norm3_w = ($signed(ext_data3_r) > 0) ? (ext_data3_r / std[3]) :
+                //                                                                 -(-ext_data3_r / std[3]);
+                // ext_norm4_w = ($signed(ext_data4_r) > 0) ? (ext_data4_r / std[4]) :
+                //                                                                 -(-ext_data4_r / std[4]);
+                // ext_norm5_w = ($signed(ext_data5_r) > 0) ? (ext_data5_r / std[5]) :
+                //                                                                 -(-ext_data5_r / std[5]);
+                // ext_norm6_w = ($signed(ext_data6_r) > 0) ? (ext_data6_r / std[6]) :
+                //                                                                 -(-ext_data6_r / std[6]);
+                // ext_norm7_w = ($signed(ext_data7_r) > 0) ? (ext_data7_r / std[7]) :
+                //                                                                 -(-ext_data7_r / std[7]);
+                
+                ext_norm0_w = ($signed(ext_data0_r) / $signed(std[0]));
+                ext_norm1_w = ($signed(ext_data1_r) / $signed(std[1]));
+                ext_norm2_w = ($signed(ext_data2_r) / $signed(std[2]));
+                ext_norm3_w = ($signed(ext_data3_r) / $signed(std[3]));
+                ext_norm4_w = ($signed(ext_data4_r) / $signed(std[4]));
+                ext_norm5_w = ($signed(ext_data5_r) / $signed(std[5]));
+                ext_norm6_w = ($signed(ext_data6_r) / $signed(std[6]));
+                ext_norm7_w = ($signed(ext_data7_r) / $signed(std[7]));
                 state_w = S_DONE;
                 finish_w = 1'b1;
             end

@@ -1213,7 +1213,6 @@ module Model (
 
     logic [2:0] state_r, state_w;
 
-    // logic [15:0] data[0:39];
     logic signed [15:0] norm_data  [0:39];
     logic signed [15:0] norm_data_T[0:39];
     logic signed [23:0] cnn_output_r [0:29], cnn_output_w[0:29];
@@ -1226,34 +1225,31 @@ module Model (
     assign o_logits[2] = top3_prob_r[2][31:8];
     assign o_char = top3_char_r;
     assign o_finished = finish_r;
-    // assign o_char[0] = norm_data_T[0][3:0];
-    // assign o_char[1] = norm_data_T[1][3:0];
-    // assign o_char[2] = norm_data_T[2][3:0];
 
     assign norm_data_T[0:4] = '{
-        norm_data[0], norm_data[8], norm_data[16], norm_data[24], norm_data[32]
-    };
+                                norm_data[0], norm_data[8], norm_data[16], norm_data[24], norm_data[32]
+                };
     assign norm_data_T[5:9] = '{
-        norm_data[1], norm_data[9], norm_data[17], norm_data[25], norm_data[33]
-    };
+                                norm_data[1], norm_data[9], norm_data[17], norm_data[25], norm_data[33]
+                };
     assign norm_data_T[10:14] = '{
-        norm_data[2], norm_data[10], norm_data[18], norm_data[26], norm_data[34]
-    };
+                                norm_data[2], norm_data[10], norm_data[18], norm_data[26], norm_data[34]
+                };
     assign norm_data_T[15:19] = '{
-        norm_data[3], norm_data[11], norm_data[19], norm_data[27], norm_data[35]
-    };
+                                norm_data[3], norm_data[11], norm_data[19], norm_data[27], norm_data[35]
+                };
     assign norm_data_T[20:24] = '{
-        norm_data[4], norm_data[12], norm_data[20], norm_data[28], norm_data[36]
-    };
+                                norm_data[4], norm_data[12], norm_data[20], norm_data[28], norm_data[36]
+                };
     assign norm_data_T[25:29] = '{
-        norm_data[5], norm_data[13], norm_data[21], norm_data[29], norm_data[37]
-    };
+                                norm_data[5], norm_data[13], norm_data[21], norm_data[29], norm_data[37]
+                };
     assign norm_data_T[30:34] = '{
-        norm_data[6], norm_data[14], norm_data[22], norm_data[30], norm_data[38]
-    };
+                                norm_data[6], norm_data[14], norm_data[22], norm_data[30], norm_data[38]
+                };
     assign norm_data_T[35:39] = '{
-        norm_data[7], norm_data[15], norm_data[23], norm_data[31], norm_data[39]
-    };
+                                norm_data[7], norm_data[15], norm_data[23], norm_data[31], norm_data[39]
+                };
 
     Normalizer norm0 (
         .i_clk(i_clk),
@@ -1452,6 +1448,12 @@ module Model (
             S_DONE: begin
                 finish_w = 1'b0;
                 state_w  = S_IDLE;
+                fc_weight_w = '{30{1'b0}};
+                fc_bias_w   = 0;
+                kernel_weight_w = '{24{1'b0}};
+                cnn_bias_w = 0;
+                tmp_char_w = 0;
+                tmp_prob_w = 0;
             end
         endcase
     end
