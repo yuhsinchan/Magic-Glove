@@ -2,11 +2,11 @@ module Core (
     input i_clk,
     input i_rst_n,
     input i_next,
-    input [15:0] i_data[0:39],
+    input signed [15:0] i_data[0:39],
     output o_next,
     output o_finished,
     output [7:0] o_tops[0:2],
-    output [31:0] o_logits[0:2],
+    output signed [31:0] o_logits[0:2],
     output [7:0] o_letter,
     output [119:0] o_word,
     output [3:0] o_length

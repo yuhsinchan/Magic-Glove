@@ -5,7 +5,7 @@ module tb;
     localparam HCLK = CLK / 2;
     localparam SF = 2.0 ** -8.0;
 
-    logic [15:0] data[0:39];
+    logic signed [15:0] data[0:39];
     integer fp;
         
     logic clk, rst, i_next, o_next, o_finished;
@@ -14,7 +14,7 @@ module tb;
     logic [119:0] o_word;
     logic [3:0] o_length;
     logic [9:0] counter;
-    logic [31:0] o_logits[0:2];
+    logic signed [31:0] o_logits[0:2];
     
     initial clk = 0;    
     initial i_next = 0;

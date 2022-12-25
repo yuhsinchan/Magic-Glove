@@ -1,0 +1,28 @@
+csi-ncvlog_cg - CSI: Command line:
+ncvlog_cg
+    -NOCOPYRIGHT
+    -CHECK_VERSION TOOL:	ncelab	15.20-s084
+    -SEM2009
+    -CDSLIB ./INCA_libs/irun.lnx86.15.20.nc/cds.lib
+    -HDLVAR ./INCA_libs/irun.lnx86.15.20.nc/hdl.var
+    -MESSAGES
+    -XHANDOFF worklib
+    -IMPLICIT worklib
+    worklib.tb:sv
+    0x53183f88
+    -LOG_FD 4
+
+csi-ncvlog_cg - CSI: *F,INTERR: INTERNAL EXCEPTION
+-----------------------------------------------------------------
+The tool has encountered an unexpected condition and must exit.
+Contact Cadence Design Systems customer support about this
+problem and provide enough information to help us reproduce it,
+including the logfile that contains this error message.
+  TOOL:	ncvlog_cg	15.20-s084
+  HOSTNAME: cad30.ee.ntu.edu.tw
+  OPERATING SYSTEM: Linux 2.6.32-754.el6.x86_64 #1 SMP Tue Jun 19 21:26:04 UTC 2018 x86_64
+  MESSAGE: $fread: gq_sf_fread - needs at least 2 arguments
+-----------------------------------------------------------------
+
+csi-ncvlog_cg - CSI: Cadence Support Investigation, recording details
+csi-ncvlog_cg - CSI: investigation complete took 0.000 secs, send this file to Cadence Support

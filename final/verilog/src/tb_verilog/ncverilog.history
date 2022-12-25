@@ -1,0 +1,302 @@
+s1(19Dec2022:17:14:50):  ncverilog +access+r tb_norm.sv 
+s2(19Dec2022:17:15:36):  ncverilog +access+r tb_norm.sv 
+s3(19Dec2022:17:19:12):  ncverilog +access+r tb_norm.sv 
+s4(19Dec2022:17:20:06):  ncverilog +access+r tb_norm.sv 
+s5(19Dec2022:17:20:43):  ncverilog +access+r tb_norm.sv 
+s6(19Dec2022:20:30:56):  ncverilog +access+r tb_norm.sv 
+s7(19Dec2022:20:32:29):  ncverilog +access+r tb_norm.sv 
+s8(19Dec2022:20:38:13):  ncverilog +access+r tb_norm.sv 
+s9(19Dec2022:20:39:51):  ncverilog +access+r tb_norm.sv 
+s10(19Dec2022:20:40:56):  ncverilog +access+r tb_norm.sv 
+s11(19Dec2022:20:41:15):  ncverilog +access+r tb_norm.sv 
+s12(19Dec2022:20:42:14):  ncverilog +access+r tb_norm.sv 
+s13(19Dec2022:20:42:50):  ncverilog +access+r tb_norm.sv 
+s14(19Dec2022:20:43:41):  ncverilog +access+r tb_norm.sv 
+s15(19Dec2022:20:44:40):  ncverilog +access+r tb_norm.sv 
+s16(19Dec2022:20:45:27):  ncverilog +access+r tb_norm.sv 
+s17(19Dec2022:20:46:19):  ncverilog +access+r tb_norm.sv 
+s18(19Dec2022:20:49:19):  ncverilog +access+r tb_norm.sv 
+s19(19Dec2022:20:50:21):  ncverilog +access+r tb_norm.sv 
+s20(19Dec2022:20:52:48):  ncverilog +access+r tb_norm.sv 
+s21(19Dec2022:20:56:30):  ncverilog +access+r tb_norm.sv 
+s22(19Dec2022:20:58:32):  ncverilog +access+r tb_norm.sv 
+s23(19Dec2022:20:59:59):  ncverilog +access+r tb_norm.sv 
+s24(19Dec2022:21:00:41):  ncverilog +access+r tb_norm.sv 
+s25(19Dec2022:21:02:13):  ncverilog +access+r tb_norm.sv 
+s26(19Dec2022:21:25:43):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s27(19Dec2022:21:26:13):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s28(19Dec2022:21:27:21):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s29(19Dec2022:21:27:34):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s30(19Dec2022:21:28:40):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s31(19Dec2022:21:29:58):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s32(19Dec2022:21:31:06):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s33(20Dec2022:00:29:48):  ncverilog +access+r tb_mul.sv 
+s34(20Dec2022:00:29:59):  ncverilog +access+r tb_mul.sv 
+s35(20Dec2022:00:30:20):  ncverilog +access+r tb_mul.sv 
+s36(20Dec2022:00:31:32):  ncverilog +access+r tb_mul.sv 
+s37(20Dec2022:00:32:29):  ncverilog +access+r tb_mul.sv 
+s38(20Dec2022:00:34:46):  ncverilog +access+r tb_mul.sv 
+s39(20Dec2022:00:35:18):  ncverilog +access+r tb_mul.sv 
+s40(20Dec2022:00:35:56):  ncverilog +access+r tb_mul.sv 
+s41(20Dec2022:00:38:28):  ncverilog +access+r tb_mul.sv 
+s42(20Dec2022:00:39:22):  ncverilog +access+r tb_mul.sv 
+s43(20Dec2022:02:29:13):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s44(20Dec2022:02:30:57):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s45(20Dec2022:02:31:50):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s46(20Dec2022:02:32:42):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s47(20Dec2022:02:34:18):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s48(20Dec2022:02:42:06):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s49(20Dec2022:02:42:24):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s50(20Dec2022:02:43:05):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s51(20Dec2022:02:46:15):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s52(20Dec2022:02:53:01):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s53(20Dec2022:02:59:53):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s54(20Dec2022:03:01:01):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s55(20Dec2022:03:02:35):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s56(20Dec2022:03:03:59):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s57(20Dec2022:03:04:31):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s58(20Dec2022:04:00:15):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s59(20Dec2022:04:02:43):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s60(20Dec2022:04:03:05):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s61(20Dec2022:04:03:33):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s62(20Dec2022:04:06:39):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s63(20Dec2022:04:11:09):  ncverilog +access+r tb_fc.sv ../fc.sv 
+s64(21Dec2022:20:23:35):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s65(21Dec2022:20:24:22):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s66(21Dec2022:20:24:44):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s67(21Dec2022:20:27:45):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s68(21Dec2022:20:33:03):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s69(21Dec2022:20:34:22):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s70(21Dec2022:20:35:12):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s71(21Dec2022:20:37:28):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s72(21Dec2022:20:38:10):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s73(21Dec2022:20:43:08):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s74(21Dec2022:20:54:56):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s75(21Dec2022:20:56:24):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s76(21Dec2022:20:56:40):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s77(21Dec2022:20:57:30):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s78(21Dec2022:20:57:38):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s79(21Dec2022:20:57:52):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s80(21Dec2022:20:58:24):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s81(21Dec2022:20:58:37):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s82(21Dec2022:20:59:26):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s83(21Dec2022:21:00:22):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s84(21Dec2022:21:10:21):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s85(21Dec2022:21:12:37):  ncverilog +access+r tb_norm.sv ../normalize.sv 
+s86(21Dec2022:21:19:42):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s87(21Dec2022:21:20:07):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s88(21Dec2022:21:21:04):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s89(21Dec2022:21:21:11):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s90(21Dec2022:21:21:49):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s91(21Dec2022:21:24:07):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s92(21Dec2022:21:26:08):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s93(21Dec2022:21:26:36):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s94(21Dec2022:21:27:02):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s95(21Dec2022:21:28:21):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s96(21Dec2022:21:31:52):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s97(21Dec2022:21:32:32):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s98(21Dec2022:21:45:01):  ncverilog +access+r tb_model.sv ../model.sv ../normalizer.sv ../Conv.sv ../fc.sv 
+s99(21Dec2022:21:47:41):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s100(21Dec2022:21:47:51):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s101(21Dec2022:21:47:57):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s102(21Dec2022:21:48:14):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s103(22Dec2022:00:02:36):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s104(22Dec2022:00:08:23):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s105(22Dec2022:00:10:04):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s106(22Dec2022:00:10:31):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s107(22Dec2022:00:14:52):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s108(22Dec2022:00:16:31):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s109(22Dec2022:00:16:37):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s110(22Dec2022:00:17:38):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s111(22Dec2022:00:18:55):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s112(22Dec2022:00:22:02):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s113(22Dec2022:00:22:08):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s114(22Dec2022:00:25:12):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s115(22Dec2022:00:33:26):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s116(22Dec2022:00:40:29):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s117(22Dec2022:00:41:29):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s118(22Dec2022:00:44:32):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s119(22Dec2022:00:45:29):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s120(22Dec2022:00:57:19):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s121(22Dec2022:00:57:57):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s122(22Dec2022:00:58:57):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s123(22Dec2022:01:11:28):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s124(22Dec2022:01:12:03):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s125(22Dec2022:01:12:34):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s126(22Dec2022:01:13:35):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s127(22Dec2022:01:14:43):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s128(23Dec2022:14:14:04):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s129(23Dec2022:14:14:24):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s130(23Dec2022:14:17:35):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s131(23Dec2022:14:19:11):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s132(23Dec2022:14:19:51):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s133(23Dec2022:14:20:30):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s134(23Dec2022:14:21:40):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s135(24Dec2022:14:52:50):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s136(24Dec2022:14:53:17):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s137(24Dec2022:14:54:47):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s138(24Dec2022:14:56:00):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s139(24Dec2022:14:56:40):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s140(24Dec2022:14:57:14):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s141(24Dec2022:14:57:32):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s142(24Dec2022:15:04:11):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s143(24Dec2022:15:08:29):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s144(24Dec2022:15:08:55):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s145(24Dec2022:15:13:53):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s146(24Dec2022:15:17:23):  ncverilog +access+r tb_dedup.sv ../dedup.sv 
+s147(24Dec2022:17:25:09):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s148(24Dec2022:17:25:52):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s149(24Dec2022:17:26:10):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s150(24Dec2022:17:26:30):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s151(24Dec2022:18:26:01):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s152(24Dec2022:18:29:30):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s153(24Dec2022:18:30:37):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s154(24Dec2022:18:36:11):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s155(24Dec2022:18:42:23):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s156(24Dec2022:18:42:59):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s157(24Dec2022:18:55:22):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s158(24Dec2022:18:56:50):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s159(24Dec2022:18:58:20):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s160(24Dec2022:19:06:16):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s161(24Dec2022:19:13:28):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s162(24Dec2022:19:17:35):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s163(24Dec2022:19:18:14):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s164(24Dec2022:19:19:05):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s165(24Dec2022:19:19:36):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s166(24Dec2022:19:20:01):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s167(24Dec2022:19:21:28):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s168(24Dec2022:19:24:06):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s169(24Dec2022:19:31:25):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s170(24Dec2022:19:33:06):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s171(24Dec2022:19:34:52):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s172(24Dec2022:19:36:00):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s173(24Dec2022:19:47:57):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s174(24Dec2022:20:00:24):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s175(24Dec2022:20:02:56):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s176(24Dec2022:21:28:05):  ncverilog +access+r tb_co 
+s177(24Dec2022:21:28:07):  ncverilog +access+r tb_core.sv 
+s178(24Dec2022:21:28:52):  ncverilog +access+r tb_core.sv 
+s179(24Dec2022:21:29:13):  ncverilog +access+r tb_core.sv 
+s180(24Dec2022:21:31:02):  ncverilog +access+r tb_core.sv 
+s181(24Dec2022:21:31:56):  ncverilog +access+r tb_core.sv 
+s182(24Dec2022:21:33:55):  ncverilog +access+r tb_core.sv 
+s183(24Dec2022:21:48:12):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s184(24Dec2022:21:49:51):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s185(24Dec2022:21:51:31):  ncverilog +access+r tb_readfile.sv 
+s186(24Dec2022:21:52:17):  ncverilog +access+r tb_readfile.sv 
+s187(24Dec2022:21:53:16):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s188(24Dec2022:21:53:44):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s189(24Dec2022:21:55:11):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s190(24Dec2022:21:56:58):  ncverilog +access+r tb_viterbi.sv ../viterbi.sv 
+s191(24Dec2022:21:57:24):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s192(24Dec2022:22:02:10):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s193(24Dec2022:22:02:55):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s194(24Dec2022:22:03:35):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s195(24Dec2022:22:04:46):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s196(24Dec2022:22:05:08):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s197(24Dec2022:22:05:57):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s198(24Dec2022:22:06:46):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s199(24Dec2022:22:11:33):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s200(24Dec2022:22:12:53):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s201(24Dec2022:22:17:02):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s202(24Dec2022:22:38:50):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv 
+s203(24Dec2022:22:40:19):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s204(24Dec2022:22:57:26):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s205(24Dec2022:23:00:08):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s206(24Dec2022:23:06:44):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s207(24Dec2022:23:24:38):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s208(24Dec2022:23:27:19):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s209(24Dec2022:23:28:34):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s210(24Dec2022:23:40:15):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s211(24Dec2022:23:40:49):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s212(25Dec2022:00:04:28):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s213(25Dec2022:00:07:34):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s214(25Dec2022:00:36:01):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s215(25Dec2022:00:36:26):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s216(25Dec2022:00:44:13):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s217(25Dec2022:00:54:55):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s218(25Dec2022:01:02:50):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s219(25Dec2022:01:03:03):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s220(25Dec2022:01:10:31):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s221(25Dec2022:01:10:59):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s222(25Dec2022:01:11:23):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s223(25Dec2022:01:15:13):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s224(25Dec2022:01:22:14):  ncverilog +access+r tb_model.sv ../model.sv 
+s225(25Dec2022:01:22:28):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s226(25Dec2022:01:23:58):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s227(25Dec2022:01:33:10):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s228(25Dec2022:01:47:10):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s229(25Dec2022:01:50:38):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s230(25Dec2022:01:51:33):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s231(25Dec2022:01:53:18):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s232(25Dec2022:01:58:48):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s233(25Dec2022:02:00:33):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s234(25Dec2022:02:05:26):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s235(25Dec2022:02:07:16):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s236(25Dec2022:02:08:01):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s237(25Dec2022:02:47:51):  ncverilog +access+r tb_model.sv ../model.sv 
+s238(25Dec2022:02:48:25):  ncverilog +access+r tb_model.sv ../model.sv 
+s239(25Dec2022:02:52:50):  ncverilog +access+r tb_model.sv ../model.sv 
+s240(25Dec2022:02:52:55):  ncverilog +access+r tb_model.sv ../model.sv 
+s241(25Dec2022:02:53:15):  ncverilog +access+r tb_model.sv ../model.sv 
+s242(25Dec2022:02:54:10):  ncverilog +access+r tb_model.sv ../model.sv 
+s243(25Dec2022:03:02:00):  ncverilog +access+r tb_model.sv ../model.sv 
+s244(25Dec2022:03:02:53):  ncverilog +access+r tb_model.sv ../model.sv 
+s245(25Dec2022:03:05:11):  ncverilog +access+r tb_model.sv ../model.sv 
+s246(25Dec2022:03:06:01):  ncverilog +access+r tb_model.sv ../model.sv 
+s247(25Dec2022:03:06:35):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s248(25Dec2022:03:07:21):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s249(25Dec2022:03:07:38):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s250(25Dec2022:04:49:35):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalize 
+s251(25Dec2022:04:49:37):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s252(25Dec2022:04:50:53):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s253(25Dec2022:04:51:24):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s254(25Dec2022:15:27:32):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s255(25Dec2022:15:29:30):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s256(25Dec2022:15:47:12):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s257(25Dec2022:16:35:51):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s258(25Dec2022:16:36:05):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s259(25Dec2022:16:36:49):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s260(25Dec2022:17:50:04):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s261(25Dec2022:17:51:42):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s262(25Dec2022:17:53:14):  ncverilog +access+r tb_core.sv 
+s263(25Dec2022:17:53:54):  ncverilog +access+r tb_core.sv 
+s264(25Dec2022:17:54:29):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s265(25Dec2022:17:57:12):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s266(25Dec2022:17:57:24):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s267(25Dec2022:18:31:05):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer_shit.sv .sv ../viterbi.sv ../dedup.sv 
+s268(25Dec2022:18:31:11):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer_shit.sv ../viterbi.sv ../dedup.sv 
+s269(25Dec2022:18:44:02):  ncverilog +access+r tb_norm_shit.sv ../normalizer.sv 
+s270(25Dec2022:19:02:11):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv .sv ../viterbi.sv ../dedup.sv 
+s271(25Dec2022:19:02:17):  ncverilog +access+r tb_core.sv ../core.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv ../viterbi.sv ../dedup.sv 
+s272(25Dec2022:21:20:27):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s273(25Dec2022:21:23:49):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s274(25Dec2022:21:26:41):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s275(25Dec2022:21:27:43):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s276(25Dec2022:21:29:10):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s277(25Dec2022:21:36:43):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s278(25Dec2022:21:37:29):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s279(25Dec2022:21:37:56):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s280(25Dec2022:21:38:35):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s281(25Dec2022:21:38:49):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s282(25Dec2022:21:42:13):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s283(25Dec2022:21:42:53):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s284(25Dec2022:21:46:17):  ncverilog +access+r tb_norm.sv ../normalizer.sv 
+s285(25Dec2022:21:47:37):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s286(25Dec2022:21:51:00):  ncverilog +access+r tb_conv.sv ../Conv.sv 
+s287(25Dec2022:21:52:36):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s288(25Dec2022:22:09:01):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s289(25Dec2022:22:09:21):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s290(25Dec2022:22:12:31):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s291(25Dec2022:22:12:48):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s292(25Dec2022:22:15:44):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s293(25Dec2022:22:15:57):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s294(25Dec2022:22:16:12):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s295(25Dec2022:22:17:21):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s296(25Dec2022:22:17:35):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s297(25Dec2022:22:19:17):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s298(25Dec2022:22:20:33):  ncverilog +access+r tb_model.sv ../model.sv ../Conv.sv ../fc.sv ../normalizer.sv 
+s299(25Dec2022:22:23:55):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s300(25Dec2022:22:33:44):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s301(25Dec2022:22:34:30):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 
+s302(25Dec2022:22:34:52):  ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv 

@@ -2,10 +2,10 @@ module Model (
     input i_clk,
     input i_rst_n,
     input i_start,
-    input [15:0] i_data[0:39],
-    output [15:0] o_norm[0:39],
-    output [23:0] o_cnn[0:29],
-    output [31:0] o_logits[0:2],
+    input signed [15:0] i_data[0:39],
+    output signed [15:0] o_norm[0:39],
+    output signed [23:0] o_cnn[0:29],
+    output signed [31:0] o_logits[0:2],
     output [4:0] o_char[0:2],
     output o_finished
 );
@@ -1221,9 +1221,9 @@ module Model (
 
     // assign o_norm = norm_data;
     // assign o_cnn = cnn_output_r;
-    assign o_logits[0] = top3_prob_r[0][31:8] >>> 8;
-    assign o_logits[1] = top3_prob_r[1][31:8] >>> 8;
-    assign o_logits[2] = top3_prob_r[2][31:8] >>> 8;
+    assign o_logits[0] = top3_prob_r[0][31:8];
+    assign o_logits[1] = top3_prob_r[1][31:8];
+    assign o_logits[2] = top3_prob_r[2][31:8];
     assign o_char = top3_char_r;
     assign o_finished = finish_r;
     // assign o_char[0] = norm_data_T[0][3:0];

@@ -1,0 +1,1 @@
+ncverilog +access+r tb_core.sv ../core.sv ../normalizer.sv ../Conv.sv ../model.sv ../viterbi.sv ../dedup.sv ../fc.sv

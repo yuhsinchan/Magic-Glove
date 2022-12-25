@@ -2,10 +2,10 @@ module FC(
     input i_clk,
     input i_rst_n,
     input i_start,
-    input [15:0] i_weight [0:29],
-    input [23:0] i_data [0:29],
-    input [15:0] i_bias,
-    output [31:0] o_output,
+    input signed [15:0] i_weight [0:29],
+    input signed [23:0] i_data [0:29],
+    input signed [15:0] i_bias,
+    output signed [31:0] o_output,
     output o_finished
 );
     localparam S_IDLE = 2'd0;

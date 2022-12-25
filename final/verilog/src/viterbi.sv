@@ -3,7 +3,7 @@ module Viterbi (
     input i_rst_n,
     input i_start,
     input i_next,
-    input [31:0] i_prob[0:2],
+    input signed [31:0] i_prob[0:2],
     input [4:0] i_char[0:2],
     output [4:0] o_char,
     output [119:0] o_seq,
