@@ -6,7 +6,7 @@ module tb;
     localparam SF = 2.0 ** -8.0;
 
     logic clk, rst, start, finished;
-    logic [2:0] state;
+    logic [1:0] state;
     logic [119:0] word_in = 120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011100010000;
     logic [119:0] word_out;
 
@@ -19,7 +19,8 @@ module tb;
         .i_start(start),
         .i_word(word_in),
         .o_finish(finished),
-        .o_word(word_out)
+        .o_word(word_out),
+        .o_state(state)
     );
 
     initial begin
@@ -41,10 +42,9 @@ module tb;
         // #(10 * CLK);
 
         while (!finished) begin
-            // $display(word_length);
             #(CLK);
         end
-        $display();
+
         $display("==========output=============");
         $display("%b", word_out);
         $finish;

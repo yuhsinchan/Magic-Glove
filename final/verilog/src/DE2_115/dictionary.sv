@@ -5,7 +5,8 @@ module Dictionary(
 	input          i_start,
 	input  [119:0] i_word,
 	output         o_finish,
-	output [119:0] o_word
+	output [119:0] o_word,
+	output [1:0]   o_state
 );
 	parameter DICT_SIZE = 500;
 	localparam bit [119:0] dict [0:DICT_SIZE - 1] = '{
@@ -519,19 +520,25 @@ module Dictionary(
 	logic finish_r, finish_w;
 	
 	logic similarity_start_r, similarity_start_w;
-	logic similarity_finish_r, similarity_finish_w, pre_similarity_finish_r;
-	logic [2:0] DTW_state_r, DTW_state_w; // debug
+	wire  similarity_finish_w;
+	logic similarity_finish_r, pre_similarity_finish_r;
+	wire  [2:0] DTW_state_w; // debug
+	logic [2:0] DTW_state_r; // debug
 	logic DTW_start_r, DTW_start_w;
-	logic DTW_finish_r, DTW_finish_w;
+	wire  DTW_finish_w;
+	logic DTW_finish_r;
 	
-	logic similarity_word_w [0:499], similarity_word_r [0:499];
+	wire  similarity_word_w [0:499];
+	logic similarity_word_r [0:499];
 	logic [119:0] DTW_candidate_word_w [0:19], DTW_candidate_word_r [0:19];
-	logic [119:0] DTW_word_r, DTW_word_w;
+	wire  [119:0] DTW_word_w;
+	logic [119:0] DTW_word_r;
 	logic [8:0] ptr_r, ptr_w;
 	
 	integer i;
-	assign o_finished = finish_r;
+	assign o_finish = finish_r;
 	assign o_word = DTW_word_r;
+	assign o_state = state_r;
 	
 	Similarity sim1(
 		.i_similarity_clk(i_clk),
@@ -557,13 +564,13 @@ module Dictionary(
 		state_w = state_r;
 		finish_w = finish_r;
 		similarity_start_w = similarity_start_r;
-		similarity_finish_w = similarity_finish_r;
+		// similarity_finish_w = similarity_finish_r;
 		DTW_start_w = DTW_start_r;
-		DTW_finish_w = DTW_finish_r;
-		DTW_word_w = DTW_word_r;
-		DTW_state_w = DTW_state_r;
+		// DTW_finish_w = DTW_finish_r;
+		// DTW_word_w = DTW_word_r;
+		// DTW_state_w = DTW_state_r;
 		DTW_candidate_word_w = DTW_candidate_word_w;
-		similarity_word_w = similarity_word_r;
+		// similarity_word_w = similarity_word_r;
 		ptr_w = ptr_r;
 		
 		case (state_r)
@@ -610,7 +617,7 @@ module Dictionary(
 			DTW_start_r             <= 1'b0;
 			DTW_finish_r            <= 1'b0;
 			DTW_word_r              <= 120'b0;
-			DTW_candidate_word_r    <= '{'{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}};
+			DTW_candidate_word_r    <= '{20{120'b0}};
 			DTW_state_r             <= 3'b0; 
 			similarity_word_r       <= '{500{1'b0}};
 			ptr_r                   <= 9'b0;
