@@ -45,6 +45,10 @@ module Core (
     logic [3:0] seq_counter_r, seq_counter_w;
     logic [119:0] tmp_viter_seq_r, tmp_viter_seq_w;
 
+    logic [119:0] dtw_seq;
+    logic dict_start_r, dict_start_w;
+    logic dict_finish;
+
     logic next_r, next_w;
     logic finish_r, finish_w;
     logic signed [15:0] data_r[0:39], data_w[0:39];
@@ -67,8 +71,8 @@ module Core (
             )
         )
     );
-    assign o_word = o_seq_r;
-    assign o_length = 3'd4;
+    assign o_word = dtw_seq;
+    assign o_length = (dtw_seq[7:0] != 8'b0) + (dtw_seq[15:8] != 8'b0) + (dtw_seq[23:16] != 8'b0) + (dtw_seq[31:24] != 8'b0) + (dtw_seq[39:32] != 8'b0) + (dtw_seq[47:40] != 8'b0) + (dtw_seq[55:48] != 8'b0) + (dtw_seq[63:56] != 8'b0) + (dtw_seq[71:64] != 8'b0) + (dtw_seq[79:72] != 8'b0) + (dtw_seq[87:80] != 8'b0) + (dtw_seq[95:88] != 8'b0) + (dtw_seq[103:96] != 8'b0) + (dtw_seq[111:104] != 8'b0) + (dtw_seq[119:112] != 8'b0);
     assign o_tops[0] = nn_top_chars[0];
     assign o_tops[1] = nn_top_chars[1];
     assign o_tops[2] = nn_top_chars[2];
@@ -106,6 +110,15 @@ module Core (
         .o_stepped(viter_stepped)
     );
 
+    Dictionary dict(
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_start(dict_start_r),
+        .i_word(viter_seq),
+        .o_finish(dict_finish),
+        .o_word(dtw_seq)
+    );
+
     always_comb begin
         nn_start_w = nn_start_r;
         pre_top_chars_w = pre_top_chars_r;
@@ -122,6 +135,8 @@ module Core (
         seq_length_w = seq_length_r;
         seq_counter_w = seq_counter_r;
         tmp_viter_seq_w = tmp_viter_seq_r;
+
+        dict_start_w = dict_start_r;
 
         next_w = next_r;
         finish_w = finish_r;
@@ -181,12 +196,14 @@ module Core (
 
                         // finish or not
                         if (dup_count_r > 30 && (nn_top_chars[0] == 5'd26 || nn_top_chars[1] == 5'd26) && o_seq_r != {120{1'b0}}) begin
+                            // $display("%b", viter_seq);
                             state_w = S_DTW;
                             dup_count_w = 0;
                             sum_logits_w = '{27{32'b0}};
                             seq_counter_w = 0;
                             tmp_viter_seq_w = viter_seq;
                             o_seq_w = viter_seq;
+                            dict_start_w = 1'b1;
                         end else begin
                             state_w = S_IDLE;
                         end
@@ -207,18 +224,24 @@ module Core (
                 end
             end
             S_DTW: begin
-                if (seq_counter_r < 4'd15) begin
-                    if (tmp_viter_seq_r[4:0] != 0) begin
-                        seq_length_w = seq_counter_r + 1;
-                        tmp_viter_seq_w = {8'b0, tmp_viter_seq_r[119:8]};
-                    end else begin
-                        finish_w = 1'b1;
-                        state_w = S_DONE;
-                    end
-                    seq_counter_w = seq_counter_r + 1;
-                end else begin
-                    finish_w = 1'b1;
+                dict_start_w = 1'b0;
+                // if (seq_counter_r < 4'd15) begin
+                //     if (tmp_viter_seq_r[4:0] != 0) begin
+                //         seq_length_w = seq_counter_r + 1;
+                //         tmp_viter_seq_w = {8'b0, tmp_viter_seq_r[119:8]};
+                //     end else begin
+                //         finish_w = 1'b1;
+                //         state_w = S_DONE;
+                //     end
+                //     seq_counter_w = seq_counter_r + 1;
+                // end else begin
+                //     finish_w = 1'b1;
+                //     state_w = S_DONE;
+                // end
+                if (dict_finish) begin
+                    // $display("finish");
                     state_w = S_DONE;
+                    finish_w = 1'b1;
                 end
             end
             S_DONE: begin
@@ -255,6 +278,8 @@ module Core (
             seq_counter_r <= 4'b0;
             tmp_viter_seq_r <= 120'b0;
 
+            dict_start_r <= 1'b0;
+
             next_r <= 1'b0;
             finish_r <= 1'b0;
             data_r <= '{40{16'b0}};
@@ -276,6 +301,8 @@ module Core (
             seq_length_r <= seq_length_w;
             seq_counter_r <= seq_counter_w;
             tmp_viter_seq_r <= tmp_viter_seq_w;
+
+            dict_start_r <= dict_start_w;
 
             next_r <= next_w;
             finish_r <= finish_w;

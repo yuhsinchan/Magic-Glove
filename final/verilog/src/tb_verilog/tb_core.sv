@@ -4,6 +4,7 @@ module tb;
     localparam CLK = 10;
     localparam HCLK = CLK / 2;
     localparam SF = 2.0 ** -8.0;
+    localparam mode = 6'b000000;
 
     logic signed [15:0] data[0:39];
     integer fp;
@@ -26,6 +27,7 @@ module tb;
         .i_rst_n(rst),
         .i_next(i_next),
         .i_data(data),
+        .i_mode(mode),
         .o_next(o_next),
         .o_tops(tops),
         .o_logits(o_logits),
@@ -69,7 +71,7 @@ module tb;
                 @(posedge clk) i_next <= 1;
                 @(posedge clk) i_next <= 0;
             end
-            for (int i = 0; i < 500; i++) begin
+            for (int i = 0; i < 5000; i++) begin
                 @(posedge clk);
                 if (o_finished) begin
                     $display("===========finished===========");
