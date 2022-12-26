@@ -1,11 +1,10 @@
-`timescale 1ns / 100ps
-module Dictionary(
-	input          i_clk,
-	input          i_rst_n,
-	input          i_start,
-	input  [119:0] i_word,
-	output         o_finish,
-	output [119:0] o_word
+module dictionary(
+	input i_clk,
+	input i_rst_n,
+	input i_start,
+	input [119:0] i_word,
+	output o_finish,
+	output [119:0] o_word,
 );
 	parameter DICT_SIZE = 500;
 	localparam bit [119:0] dict [0:DICT_SIZE - 1] = '{
@@ -508,38 +507,36 @@ module Dictionary(
 		120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110100000001000010100,
 		120'b000000000000000000000000000000000000000000000000000101000000111100010000000010100001010100010100000001100001011000010010,
 		120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011010000011010001011000001011,
-		120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000010000000010010000001000011010
-	};
+		120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000010000000010010000001000011010,
+	}	
 	
-	localparam S_IDLE = 2'd0;
-	localparam S_CALC = 2'd1;
-	localparam S_DONE = 2'd2;
+	localparam S_IDLE = 0;
+	localparam S_CALC = 1;
+	localparam S_DONE = 2;
 	
 	logic [1:0] state_r, state_w;
 	logic finish_r, finish_w;
-	
 	logic similarity_start_r, similarity_start_w;
-	logic similarity_finish_r, similarity_finish_w, pre_similarity_finish_r;
-	logic [2:0] DTW_state_r, DTW_state_w; // debug
+	logic similarity_finish_r, similarity_finish_w, pre_similarity_finish;
 	logic DTW_start_r, DTW_start_w;
 	logic DTW_finish_r, DTW_finish_w;
-	
-	logic similarity_word_w [0:499], similarity_word_r [0:499];
-	logic [119:0] DTW_candidate_word_w [0:19], DTW_candidate_word_r [0:19];
+	logic similarity_word_w [0:499]
+	logic similarity_word_r [0:499]
+	logic [119:0] DTW_candidate_word_w [0:19]
+	logic [119:0] DTW_candidate_word_r [0:19]
 	logic [119:0] DTW_word_r, DTW_word_w;
-	logic [8:0] ptr_r, ptr_w;
 	
-	integer i;
+	interger i;
 	assign o_finished = finish_r;
 	assign o_word = DTW_word_r;
 	
-	Similarity sim1(
+	similarity sim1(
 		.i_similarity_clk(i_clk),
 		.i_similarity_rst_n(i_rst_n),
 		.i_similarity_start(similarity_start_r),
 		.i_similarity_word(i_word),
-		.o_similarity_finish(similarity_finish_w),
-		.o_similarity_word(similarity_word_w)
+		.o_similarity_finish(similarity_finish_r),
+		.o_similarity_word(similarity_word_r),
 	);
 	
 	DTW dtw1(
@@ -548,9 +545,8 @@ module Dictionary(
 		.i_DTW_start(DTW_start_r),
 		.i_DTW_word(i_word),
 		.i_DTW_candidate_word(DTW_candidate_word_r),
-		.o_DTW_finish(DTW_finish_w),
-		.o_DTW_word(DTW_word_w),
-		.o_state(DTW_state_w)
+		.o_DTW_finish(DTW_finish_r),
+		.o_DTW_word(DTW_word_r),
 	);
 	
 	always_comb begin
@@ -561,74 +557,78 @@ module Dictionary(
 		DTW_start_w = DTW_start_r;
 		DTW_finish_w = DTW_finish_r;
 		DTW_word_w = DTW_word_r;
-		DTW_state_w = DTW_state_r;
-		DTW_candidate_word_w = DTW_candidate_word_w;
-		similarity_word_w = similarity_word_r;
-		ptr_w = ptr_r;
+		
+		initial begin
+			for (i = 0; i < 20; i = i + 1) begin
+				DTW_candidate_word_w[i] = DTW_candidate_word_w[i];
+			end
+		end
+		
+		initial begin
+			for (i = 0; i < 500; i = i + 1) begin
+				similarity_word_r[i] = similarity_word_w[i];
+			end
+		end
 		
 		case (state_r)
 			S_IDLE: begin
-				finish_w = 1'b0;
 				if (i_start) begin
-					similarity_start_w = i_start;
-					state_w = S_CALC;
+					state_w = S_CALC
 				end
 			end
 			S_CALC: begin
-				finish_w = DTW_finish_r;
-				
+				similarity_start_w = i_start;
 				if (similarity_finish_r) begin;
-					for (i = 0; i < DICT_SIZE; i = i + 1) begin
-						if(similarity_word_r[i] == 1'b1) begin
-							DTW_candidate_word_w[ptr_r] = dict[i];
-							ptr_w = ptr_r + 1;
+					integer ptr = 0;
+					initial begin
+						for (i = 0; i < COUNT_DICT_SIZE; i = i + 1) begin
+							if(similarity_word_r[i] == 0'b1) begin
+								DTW_candidate_word_w[ptr] = dict[i];
+							end
 						end
 					end
-				end else if (pre_similarity_finish_r && !similarity_finish_r) begin
-					DTW_start_w = 1'b1;
+				end else if (pre_similarity_finish && !similarity_finish_r) begin
+					DTW_start_w = 0'b1;
 				end
+				finish_w = DTW_finish_r;
 				
 				if (finish_r) begin
-					state_w = S_DONE;
+					state_w = S_DONE
 				end
 			end
 			S_DONE: begin
-				finish_w = 1'b1;
+				finish_w = 1'b0;
 				state_w = S_IDLE;
 			end
 		endcase
 		
 	end
 
-	always_ff @ (posedge i_clk or posedge i_rst_n) begin
-		if (i_rst_n) begin
-			state_r                 <= S_IDLE;
-			finish_r                <= 1'b0;
-			similarity_start_r      <= 1'b0;
-			similarity_finish_r     <= 1'b0;
-			pre_similarity_finish_r <= 1'b0;
-			DTW_start_r             <= 1'b0;
-			DTW_finish_r            <= 1'b0;
-			DTW_word_r              <= 120'b0;
-			DTW_candidate_word_r    <= '{'{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}, '{120'b0}};
-			DTW_state_r             <= 3'b0; 
-			similarity_word_r       <= '{500{1'b0}};
-			ptr_r                   <= 9'b0;
-
+	always_ff @ (posedge i_clk or negedge i_rst_n) begin
+		if (!i_rst_n) begin
+			state_r <= S_IDLE;
+			finish_r <= 1'b0;
+			similarity_start_r <= 1'b0;
+			similarity_finish_r <= 1'b0;
+			pre_similarity_finish <= 1'b0;
+			DTW_start_r <= 1'b0;
+			DTW_finish_r <= 1'b0;
+			DTW_word_r <= 120'b0;
+			DTW_candidate_word_r[i] = '{20{120'b0}};
+			similarity_word_r <= '{500{1'b0}};
 			
 		end else begin
-			state_r                 <= state_w;
-			finish_r                <= finish_w;
-			similarity_start_r      <= similarity_start_w;
-			similarity_finish_r     <= similarity_finish_w;
-			pre_similarity_finish_r <= similarity_finish_r;
-			DTW_start_r             <= DTW_start_w;
-			DTW_finish_r            <= DTW_finish_w;
-			DTW_word_r              <= DTW_word_w;
-			DTW_candidate_word_r    <= DTW_candidate_word_w;
-			DTW_state_r             <= DTW_state_w;
-			similarity_word_r       <= similarity_word_w;
-			ptr_r                   <= ptr_w;
+			finish_r <= finish_w;
+			state_r <= state_w;
+			similarity_start_r <= similarity_start_w;
+			similarity_finish_r <= similarity_finish_w;
+			pre_similarity_finish <= similarity_finish_r;
+			DTW_start_r <= DTW_start_w;
+			DTW_finish_r <= DTW_finish_w;
+			DTW_word_r <= DTW_word_w;
+			
+			DTW_candidate_word_r <= DTW_candidate_word_w;
+			similarity_word_r <= similarity_word_w;
 		end
 	end
 endmodule

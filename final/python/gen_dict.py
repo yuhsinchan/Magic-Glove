@@ -47,7 +47,7 @@ if __name__ == "__main__":
             out_fp.write("\toutput ")
             if setting.get("bits"):
                 out_fp.write(f"[{config['bits'] - 1}:0] ")
-            out_fp.write(f"{port},\n")
+            out_fp.write(f"{port}\n")
 
         out_fp.write(");\n")
 
@@ -58,8 +58,7 @@ if __name__ == "__main__":
             lines = in_fp.readlines()
             for i, line in enumerate(lines):
                 if i < 500:
-                    line = (line.split(",")[0])
-                    # [::-1] # reverse order
+                    line = (line.split(",")[0])[::-1] # reverse order
                     # print(line)
                     length = len(line.split(",")[0]) 
                     out_fp.write("\t\t120'b")
