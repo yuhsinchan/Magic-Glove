@@ -6,12 +6,8 @@ module tb;
     localparam SF = 2.0 ** -8.0;
 
     logic clk, rst, start, finished;
-    logic [2:0] state;
-    logic [103:0] word_count;
-    logic [119:0] word_in = 120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011100010000;
+    logic [119:0] word_in = 120'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001101000011110000111100010010;
     logic similarity_word [0:499];
-    logic [4:0] similarity_value [0:499];
-    logic [4:0] max_similarity_value;
 
     initial clk = 0;
     always #HCLK clk = ~clk;
@@ -22,11 +18,7 @@ module tb;
 	    .i_similarity_start(start),
 	    .i_similarity_word(word_in),
 	    .o_similarity_finish(finished),
-	    .o_similarity_word(similarity_word),
-        .o_similarity_state(state),
-        .o_word_count(word_count),
-        .o_similarity_value(similarity_value),
-        .o_max_similarity_value(max_similarity_value)
+	    .o_similarity_word(similarity_word)
     );
 
     initial begin
@@ -54,8 +46,6 @@ module tb;
 
         $display();
         $display("==========output=============");
-        // $display("word count");
-        // $display("%b", word_count);
 
         
         // for (int i = 0; i < 500; i = i + 1) begin

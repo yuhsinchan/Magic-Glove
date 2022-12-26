@@ -515,6 +515,7 @@ module Similarity(
 	};
 	
 	localparam bit [7:0] alphabet [0:25] = '{
+		8'b00000001,
 		8'b00000010,
 		8'b00000011,
 		8'b00000100,
@@ -539,8 +540,7 @@ module Similarity(
 		8'b00010111,
 		8'b00011000,
 		8'b00011001,
-		8'b00011010,
-		8'b00011011
+		8'b00011010
 	};
 	
 	// local parameters
@@ -551,17 +551,21 @@ module Similarity(
 	localparam S_DONE      = 3'd4;
 	
 	// logics
-	logic [2:0] state_r, state_w;
-	logic finish_r, finish_w;
+	logic [2:0]              state_r, state_w;
+	logic                    finish_r, finish_w;
 	logic [COUNT_SIZE - 1:0] word_count_r, word_count_w;
-	logic [119:0] word_r, word_w;
-	logic         similarity_word_w  [0:COUNT_DICT_SIZE - 1], similarity_word_r  [0:COUNT_DICT_SIZE - 1];
-	logic [4:0]   similarity_value_w [0:COUNT_DICT_SIZE - 1], similarity_value_r [0:COUNT_DICT_SIZE - 1];
-	logic [4:0]   max_similarity_value_r, max_similarity_value_w;
-	logic [8:0]   wd_r, wd_w;
-	logic [4:0]   ptr_r, ptr_w;
+	logic [119:0]            word_r, word_w;
+	logic                    similarity_word_w  [0:COUNT_DICT_SIZE - 1], similarity_word_r  [0:COUNT_DICT_SIZE - 1];
 	
-	integer i, ptr_word;
+	logic [3:0]              word_length_r, word_length_w;
+	logic [3:0]              dict_word_length_w [0:COUNT_DICT_SIZE - 1], dict_word_length_r [0:COUNT_DICT_SIZE - 1];
+	
+	logic [14:0]             similarity_value_w [0:COUNT_DICT_SIZE - 1], similarity_value_r [0:COUNT_DICT_SIZE - 1];
+	logic [14:0]             max_similarity_value_r, max_similarity_value_w;
+	logic [8:0]              wd_r, wd_w;
+	logic [4:0]              ptr_r, ptr_w;
+	
+	integer i, j, ptr_word;
 	
 	// assign values
 	assign o_similarity_finish = finish_r;
@@ -577,6 +581,8 @@ module Similarity(
 		max_similarity_value_w = max_similarity_value_r;
 		wd_w = wd_r;
 		ptr_w = ptr_r;
+		word_length_w = word_length_r;
+		dict_word_length_w = dict_word_length_r;
 		
 		case (state_r)
 			S_IDLE: begin
@@ -586,6 +592,23 @@ module Similarity(
 				end
 			end
 			S_PRE_CALC: begin
+				// calculate word length
+				for (i = 0; i < 120; i = i + 8) begin
+					if (i_similarity_word[i+7 -: 8] != 8'b0) begin
+						word_length_w = word_length_w + 1'b1;
+					end
+				end
+				// $display(word_length_w);
+
+				for (i = 0; i < COUNT_DICT_SIZE; i = i + 1) begin
+					for (j = 0; j < 104; j = j + 4) begin
+						if (count_dict[i][j +: 3] != 4'b0) begin
+							dict_word_length_w[i] = dict_word_length_w[i] + count_dict[i][j +: 3];
+						end
+					end
+				end
+				// $display(dict_word_length_w[399]);
+
 				// calculate word count
 				for (ptr_word = 0; ptr_word < 120; ptr_word = ptr_word + 8) begin
 					if (alphabet[0] == i_similarity_word[ptr_word +: 7]) begin
@@ -726,14 +749,23 @@ module Similarity(
 					state_w = S_POST_CALC;
 				end else begin
 					for (ptr_word = 0; ptr_word < 120; ptr_word = ptr_word + 4) begin
-						// output the smaller value
-						if (count_dict[wd_r][ptr_word +:3] >= word_count_r[ptr_word +:3]) begin
-							similarity_value_w[wd_r] = similarity_value_w[wd_r] + {100'b0, word_count_r[ptr_word +:3]};
-						end else begin
-							similarity_value_w[wd_r] = similarity_value_w[wd_r] + {100'b0, count_dict[wd_r][ptr_word +:3]};
+						// output the bigger value
+						if ((count_dict[wd_r][ptr_word +:3] != 4'b0) && (word_count_r[ptr_word +:3] != 4'b0)) begin
+							if (count_dict[wd_r][ptr_word +:3] <= word_count_r[ptr_word +:3]) begin
+								similarity_value_w[wd_r] = similarity_value_w[wd_r] + word_count_r[ptr_word +:3];
+							end else begin
+								similarity_value_w[wd_r] = similarity_value_w[wd_r] + count_dict[wd_r][ptr_word +:3];
+							end
 						end
 					end
+
+					if (word_length_r <= dict_word_length_r[wd_r]) begin
+						similarity_value_w[wd_r] = similarity_value_w[wd_r] * 1024 / dict_word_length_r[wd_r];
+					end else begin
+						similarity_value_w[wd_r] = similarity_value_w[wd_r] * 1024 / word_length_r;
+					end
 					
+
 					if (similarity_value_w[wd_r] >= max_similarity_value_r) begin
 						max_similarity_value_w = similarity_value_w[wd_r];
 					end
@@ -773,10 +805,12 @@ module Similarity(
 			word_count_r           <= 104'b0;
 			word_r                 <= 120'b0;
 			similarity_word_r      <= '{500{1'b0}};
-			similarity_value_r     <= '{500{5'b0}};
-			max_similarity_value_r <= 5'b0;
+			similarity_value_r     <= '{500{15'b0}};
+			max_similarity_value_r <= 15'b0;
 			wd_r                   <= 9'b0;
 			ptr_r                  <= 5'b0;
+			word_length_r          <= 4'b0;
+			dict_word_length_r     <= '{500{4'b0}};
 		end else begin
 			state_r                <= state_w;
 			finish_r               <= finish_w;
@@ -787,6 +821,8 @@ module Similarity(
 			max_similarity_value_r <= max_similarity_value_w;
 			wd_r                   <= wd_w;
 			ptr_r                  <= ptr_w;
+			word_length_r          <= word_length_w;
+			dict_word_length_r     <= dict_word_length_w;
 		end
 	end
 endmodule

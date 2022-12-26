@@ -18,7 +18,7 @@ config = {
 }
 
 def character2byte(fp, c):
-    num = ord(c) - ord('a') + 2
+    num = ord(c) - ord('a') + 1
     buffer = []
     for i in range(8):
         buffer.append(num % 2)

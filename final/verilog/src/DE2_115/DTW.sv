@@ -110,6 +110,11 @@ module DTW(
 				end
 			end
             S_LEN_CALC: begin
+                // $display("DTW candidate");
+                // for (i = 0; i < 20; i = i + 1) begin
+                //     $display("%b", i_DTW_candidate_word[i]);
+                // end
+                // $display();
 				// calculate word length
                 for (i = 0; i < 120; i = i + 8) begin
                     if (i_DTW_word[i+7 -: 8] != 8'b0) begin
@@ -196,7 +201,7 @@ module DTW(
                     end
                 end
 
-                if (counter_r == total_length_r - 1) begin
+                if (counter_r == total_length_r - 2) begin
                     DTW_value_w[wd_r] = DTW_table_d_w[word_length_r - 1] * 1024 / candidate_word_length_r[wd_r];
                     state_w = S_POST_CALC;
                     counter_w = 0;
@@ -204,7 +209,10 @@ module DTW(
 
 			end
             S_POST_CALC: begin                
+                // $write("dp value: ");
+                // $display(DTW_value_r[wd_r]);
                 if (DTW_value_r[wd_r] < min_value_r) begin
+                    // $write("min!");
                     min_value_w = DTW_value_r[wd_r];
                     word_w = i_DTW_candidate_word[wd_r];
                 end
