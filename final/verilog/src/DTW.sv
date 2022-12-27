@@ -42,7 +42,7 @@ module DTW (
     logic [VALUE_LEN + 10 - 1:0] min_value_w, min_value_r;
     logic [VALUE_LEN - 1:0] wd_w, wd_r;
 
-    integer i, j;
+    // integer i, j;
 
     assign o_DTW_finish = finish_r;
     assign o_DTW_word = word_r;
@@ -107,7 +107,9 @@ module DTW (
                 counter_w = 0;
                 wd_w = 0;
                 if (i_DTW_start) begin
+                    word_w = 120'b0;
                     state_w = S_LEN_CALC;
+                    min_value_w = 15'b111111111111111;
                 end
             end
             S_LEN_CALC: begin
@@ -119,7 +121,7 @@ module DTW (
                 // calculate word length
                 word_length_w = (i_DTW_word[7:0] != 8'b0) +(i_DTW_word[15:8] != 8'b0) +(i_DTW_word[23:16] != 8'b0) + (i_DTW_word[31:24] != 8'b0) +(i_DTW_word[39:32] != 8'b0) +(i_DTW_word[47:40] != 8'b0) +(i_DTW_word[55:48] != 8'b0) +(i_DTW_word[63:56] != 8'b0) +(i_DTW_word[71:64] != 8'b0) +(i_DTW_word[79:72] != 8'b0) +(i_DTW_word[87:80] != 8'b0) +(i_DTW_word[95:88] != 8'b0) +(i_DTW_word[103:96] != 8'b0) +(i_DTW_word[111:104] != 8'b0) +(i_DTW_word[119:112] != 8'b0);
 
-                for (i = 0; i < 20; i = i + 1) begin
+                for (integer i = 0; i < 20; i = i + 1) begin
                     candidate_word_length_w[i] = (i_DTW_candidate_word[i][7:0] != 8'b0) + (i_DTW_candidate_word[i][15:8] != 8'b0) +(i_DTW_candidate_word[i][23:16] != 8'b0) +(i_DTW_candidate_word[i][31:24] != 8'b0) +(i_DTW_candidate_word[i][39:32] != 8'b0) +(i_DTW_candidate_word[i][47:40] != 8'b0) +(i_DTW_candidate_word[i][55:48] != 8'b0) +(i_DTW_candidate_word[i][63:56] != 8'b0) +(i_DTW_candidate_word[i][71:64] != 8'b0) +(i_DTW_candidate_word[i][79:72] != 8'b0) +(i_DTW_candidate_word[i][87:80] != 8'b0) +(i_DTW_candidate_word[i][95:88] != 8'b0) +(i_DTW_candidate_word[i][103:96] != 8'b0) +(i_DTW_candidate_word[i][111:104] != 8'b0) +(i_DTW_candidate_word[i][119:112] != 8'b0);
                 end
                 state_w = S_PRE_CALC;
@@ -129,13 +131,13 @@ module DTW (
                     state_w = S_DONE;
                 end else begin
                     // reset diff_table
-                    for (i = 0; i < CHAR_NUM; i = i + 1) begin
-                        for (j = 0; j < CHAR_NUM; j = j + 1) begin
+                    for (integer i = 0; i < CHAR_NUM; i = i + 1) begin
+                        for (integer j = 0; j < CHAR_NUM; j = j + 1) begin
                             DTW_table_diff_w[i][j] = 1'b0;
                         end
                     end
                     // reset all value
-                    for (i = 0; i < CHAR_NUM; i = i + 1) begin
+                    for (integer i = 0; i < CHAR_NUM; i = i + 1) begin
                         DTW_table_d_w[i]  = 5'b0;
                         DTW_table_dd_w[i] = 5'b0;
                     end
@@ -157,8 +159,8 @@ module DTW (
                     // $display(total_length_w);
 
                     // calculate DTW_table_diff
-                    for (i = 0; i < word_length_r; i = i + 1) begin
-                        for (j = 0; j < candidate_word_length_r[wd_r]; j = j + 1) begin
+                    for (integer i = 0; i < 15; i = i + 1) begin
+                        for (integer j = 0; j < 15; j = j + 1) begin
                             if (i_DTW_word[i*8+7-:8] == i_DTW_candidate_word[wd_r][j*8+7-:8]) begin
                                 DTW_table_diff_w[i][j] = 1'b0;
                             end else begin
@@ -182,13 +184,13 @@ module DTW (
             S_CALC: begin
                 counter_w = counter_r + 1;
 
-                for (i = 0; i < CHAR_NUM; i = i + 1) begin
+                for (integer i = 0; i < CHAR_NUM; i = i + 1) begin
                     if (DTW_valid_w[i]) begin
                         DTW_table_d_w[i] = DTW_table_w[i];
                     end
                 end
 
-                for (i = 0; i < CHAR_NUM; i = i + 1) begin
+                for (integer i = 0; i < CHAR_NUM; i = i + 1) begin
                     if (DTW_valid_w[i]) begin
                         DTW_table_dd_w[i] = DTW_table_d_r[i];
                     end
@@ -232,22 +234,22 @@ module DTW (
             DTW_table_d_r <= '{15{5'b0}};
             DTW_table_dd_r <= '{15{5'b0}};
             DTW_table_diff_r <= '{
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}},
-                                                                '{15{1'b0}}
-                                                };
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}},
+                '{15{1'b0}}
+            };
             DTW_value_r <= '{20{15'b0}};
             min_value_r <= 15'b111111111111111;
             wd_r <= 5'b0;

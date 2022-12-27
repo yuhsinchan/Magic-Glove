@@ -699,6 +699,11 @@ module Similarity(
 				finish_w = 1'b0;
 				if (i_similarity_start) begin
 					state_w = S_PRE_CALC;
+                    similarity_value_w = 0;
+                    topN_similarity_w = '{20{10'b0}};
+                    topN_value_w = '{20{15'b0}};
+                    tmp_similarity_w = '{20{10'b0}};
+                    tmp_value_w = '{20{15'b0}};
 				end
 			end
 			S_PRE_CALC: begin

@@ -28,6 +28,7 @@ module Core (
     logic nn_finish; // model finished
     logic signed [31:0] nn_logits[0:2]; // top 3 prob
     logic [4:0] nn_top_chars[0:2]; // top 3 chars
+    logic [4:0] counter_r, counter_w;
 
     logic signed [31:0] sum_logits_r[0:26], sum_logits_w[0:26];
     logic signed [31:0] avg_logits_r[0:2], avg_logits_w[0:2];
@@ -53,24 +54,28 @@ module Core (
     logic finish_r, finish_w;
     logic signed [15:0] data_r[0:39], data_w[0:39];
     logic no_dup;
+    logic [4:0] output_char_r, output_char_w;
         
     logic [4:0] top_chars0, top_chars1, top_chars2;
 
     assign o_next = next_r;
     assign o_finished = finish_r;
-    assign o_letter = (i_mode == 6'b000000) ? viter_o_char: (
-        (i_mode == 6'b000001) ? pre_top_chars_d_r[0] + 1: (
-            (i_mode == 6'b000010) ? pre_top_chars_d_r[1] + 1 : (
-                (i_mode == 6'b000011) ? pre_top_chars_d_r[2] + 1 : (
-                    (i_mode == 6'b000100) ? nn_top_chars[0] + 1 : (
-                        (i_mode == 6'b000101) ? nn_top_chars[1] + 1 : (
-                            (i_mode == 6'b000110) ? nn_top_chars[2] + 1 : 0
-                        )
-                    )
-                )
-            )
-        )
-    );
+    assign o_letter = output_char_r;
+    
+    // (i_mode == 6'b000000) ? viter_o_char: (
+    //     (i_mode == 6'b000001) ? pre_top_chars_d_r[0] + 1: (
+    //         (i_mode == 6'b000010) ? pre_top_chars_d_r[1] + 1 : (
+    //             (i_mode == 6'b000011) ? pre_top_chars_d_r[2] + 1 : (
+    //                 (i_mode == 6'b000100) ? nn_top_chars[0] + 1 : (
+    //                     (i_mode == 6'b000101) ? nn_top_chars[1] + 1 : (
+    //                         (i_mode == 6'b000110) ? nn_top_chars[2] + 1 : 0
+    //                     )
+    //                 )
+    //             )
+    //         )
+    //     )
+    // );
+
     assign o_word = dtw_seq;
     assign o_length = (dtw_seq[7:0] != 8'b0) + (dtw_seq[15:8] != 8'b0) + (dtw_seq[23:16] != 8'b0) + (dtw_seq[31:24] != 8'b0) + (dtw_seq[39:32] != 8'b0) + (dtw_seq[47:40] != 8'b0) + (dtw_seq[55:48] != 8'b0) + (dtw_seq[63:56] != 8'b0) + (dtw_seq[71:64] != 8'b0) + (dtw_seq[79:72] != 8'b0) + (dtw_seq[87:80] != 8'b0) + (dtw_seq[95:88] != 8'b0) + (dtw_seq[103:96] != 8'b0) + (dtw_seq[111:104] != 8'b0) + (dtw_seq[119:112] != 8'b0);
     assign o_tops[0] = nn_top_chars[0];
@@ -123,6 +128,7 @@ module Core (
         nn_start_w = nn_start_r;
         pre_top_chars_w = pre_top_chars_r;
         pre_top_chars_d_w = pre_top_chars_d_r;
+        counter_w = counter_r;
 
         sum_logits_w = sum_logits_r;
         avg_logits_w = avg_logits_r;
@@ -136,6 +142,7 @@ module Core (
         seq_counter_w = seq_counter_r;
         tmp_viter_seq_w = tmp_viter_seq_r;
 
+        output_char_w = output_char_r;
         dict_start_w = dict_start_r;
 
         next_w = next_r;
@@ -157,7 +164,30 @@ module Core (
             S_NN: begin
                 nn_start_w = 1'b0;
                 if (nn_finish) begin
-                    state_w = S_DEDUP;
+                    if (i_mode[5]) begin
+                        state_w = S_IDLE;
+                        case (i_mode[2:0])
+                            3'b100: begin
+                                output_char_w = nn_top_chars[0] + 1;
+                            end
+                            3'b101: begin
+                                output_char_w = nn_top_chars[1] + 1;
+                            end
+                            3'b110: begin
+                                output_char_w = nn_top_chars[2] + 1;
+                            end
+                        endcase
+                        if (counter_r == 5'd29) begin
+                            finish_w = 1'b1;
+                            seq_length_w = 0;
+                            counter_w = 0;
+                        end else begin
+                            next_w = 1'b1;
+                            counter_w = counter_r + 1;
+                        end
+                    end else begin
+                        state_w = S_DEDUP;
+                    end
                 end
             end
             S_DEDUP: begin
@@ -196,7 +226,6 @@ module Core (
 
                         // finish or not
                         if (dup_count_r > 30 && (nn_top_chars[0] == 5'd26 || nn_top_chars[1] == 5'd26) && o_seq_r != {120{1'b0}}) begin
-                            // $display("%b", viter_seq);
                             state_w = S_DTW;
                             dup_count_w = 0;
                             sum_logits_w = '{27{32'b0}};
@@ -217,6 +246,29 @@ module Core (
                 sum_logits_w[nn_top_chars[1]] = nn_logits[1];
                 sum_logits_w[nn_top_chars[2]] = nn_logits[2];
                 if (viter_stepped) begin
+                    case (i_mode[2:0])
+                        3'b000: begin
+                            output_char_w = viter_o_char;
+                        end
+                        3'b001: begin
+                            output_char_w = pre_top_chars_r[0] + 1;
+                        end
+                        3'b010: begin
+                            output_char_w = pre_top_chars_r[1] + 1;
+                        end
+                        3'b011: begin
+                            output_char_w = pre_top_chars_r[2] + 1;
+                        end
+                        3'b100: begin
+                            output_char_w = nn_top_chars[0] + 1;
+                        end
+                        3'b101: begin
+                            output_char_w = nn_top_chars[1] + 1;
+                        end
+                        3'b110: begin
+                            output_char_w = nn_top_chars[2] + 1;
+                        end
+                    endcase
                     pre_top_chars_w = nn_top_chars;
                     state_w = S_IDLE;
                     next_w = 1'b1;
@@ -265,6 +317,7 @@ module Core (
             nn_start_r <= 1'b0;
             pre_top_chars_r <= '{3{5'b0}};
             pre_top_chars_d_r <= '{3{5'b0}};
+            counter_r <= 5'b0;
 
             sum_logits_r <= '{27{32'b0}};
             avg_logits_r <= '{3{32'b0}};
@@ -279,6 +332,7 @@ module Core (
             tmp_viter_seq_r <= 120'b0;
 
             dict_start_r <= 1'b0;
+            output_char_r <= 5'b0;
 
             next_r <= 1'b0;
             finish_r <= 1'b0;
@@ -289,6 +343,7 @@ module Core (
             nn_start_r <= nn_start_w;
             pre_top_chars_r <= pre_top_chars_w;
             pre_top_chars_d_r <= pre_top_chars_d_w;
+            counter_r <= counter_w;
 
             sum_logits_r <= sum_logits_w;
             avg_logits_r <= avg_logits_w;
@@ -303,6 +358,7 @@ module Core (
             tmp_viter_seq_r <= tmp_viter_seq_w;
 
             dict_start_r <= dict_start_w;
+            output_char_r <= output_char_w;
 
             next_r <= next_w;
             finish_r <= finish_w;

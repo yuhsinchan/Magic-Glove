@@ -637,7 +637,7 @@ module Dictionary (
     logic [119:0] DTW_word_r;
     logic [8:0] ptr_r, ptr_w;
 
-    integer i;
+    // integer i;
     assign o_finish = finish_r;
     assign o_word = o_reverse_word_r;
     assign o_state = state_r;
@@ -674,7 +674,7 @@ module Dictionary (
         // DTW_finish_w = DTW_finish_r;
         // DTW_word_w = DTW_word_r;
         // DTW_state_w = DTW_state_r;
-        DTW_candidate_word_w = DTW_candidate_word_w;
+        DTW_candidate_word_w = DTW_candidate_word_r;
         // similarity_word_w = similarity_word_r;
         ptr_w = ptr_r;
 
@@ -687,6 +687,7 @@ module Dictionary (
             S_IDLE: begin
                 finish_w = 1'b0;
                 if (i_start) begin
+                    o_reverse_word_w = 0;
                     state_w = S_IREV;
                     counter_w = 0;
                     tmp_word_w = i_word;
@@ -707,11 +708,15 @@ module Dictionary (
                 similarity_start_w = 0;
 
                 if (similarity_finish_r) begin
-                    for (i = 0; i < 20; i = i + 1) begin
+                    for (integer i = 0; i < 20; i = i + 1) begin
                         DTW_candidate_word_w[i] = dict[similarity_word_r[i]];
                     end
-                end else if (pre_similarity_finish_r && !similarity_finish_r) begin
+                end 
+                else if (pre_similarity_finish_r && !similarity_finish_r) begin
                     DTW_start_w = 1'b1;
+                end 
+                else begin
+                    DTW_start_w = 1'b0;
                 end
 
                 if (DTW_finish_r) begin

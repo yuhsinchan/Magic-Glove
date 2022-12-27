@@ -758,17 +758,17 @@ module Viterbi (
     logic stepped_r, stepped_w, finish_r, finish_w;
 
     logic [4:0] o_char_r, o_char_w;
-    // logic signed [63:0] this_prob0, this_prob1, this_prob2;
+    logic signed [63:0] this_prob0, this_prob1, this_prob2;
         
-    // logic [15:0] this_trans_prob0, this_trans_prob1, this_trans_prob2;
+    logic [15:0] this_trans_prob0, this_trans_prob1, this_trans_prob2;
         
-    // assign this_prob0 = i_prob[0];
-    // assign this_prob1 = i_prob[1];
-    // assign this_prob2 = i_prob[2];
+    assign this_prob0 = i_prob[0];
+    assign this_prob1 = i_prob[1];
+    assign this_prob2 = i_prob[2];
         
-    // assign this_trans_prob0 = transition_prob[(prev_char_r[0] + 1) * 27 + i_char[counter_r]];
-    // assign this_trans_prob1 = transition_prob[(prev_char_r[1] + 1) * 27 + i_char[counter_r]];
-    // assign this_trans_prob2 = transition_prob[(prev_char_r[2] + 1) * 27 + i_char[counter_r]];
+    assign this_trans_prob0 = transition_prob[(prev_char_r[0] + 1) * 27 + i_char[counter_r]];
+    assign this_trans_prob1 = transition_prob[(prev_char_r[1] + 1) * 27 + i_char[counter_r]];
+    assign this_trans_prob2 = transition_prob[(prev_char_r[2] + 1) * 27 + i_char[counter_r]];
 
     assign o_seq = top_seq_r;
 
@@ -811,13 +811,6 @@ module Viterbi (
                     topN_seq0_w = 120'b0;
                     topN_seq1_w = 120'b0;
                     topN_seq2_w = 120'b0;
-                    top_seq_w = 120'b0;
-                    tmp_prob0_w = 0;
-                    tmp_prob1_w = 0;
-                    tmp_prob2_w = 0;
-                    prev_char_w = '{3{5'b0}};
-                    this_prob_w = '{3{64'b0}};
-                    tmp_seq_w   = '{3{120'b0}};
                 end
                 if (i_next) begin
                     state_w = S_CALC;
@@ -889,14 +882,14 @@ module Viterbi (
         if (i_rst_n) begin
             prev_char_r <= '{3{5'b0}};
             state_r <= S_IDLE;
-            topN_prob0_r <= 64'b0;
-            topN_prob1_r <= 64'b0;
-            topN_prob2_r <= 64'b0;
-            tmp_prob0_r <= 64'b0;
-            tmp_prob1_r <= 64'b0;
-            tmp_prob2_r <= 64'b0;
-            this_prob_r <= '{3{64'b0}};
-            tmp_seq_r <= '{3{120'b0}};
+            topN_prob0_r <= 32'b0;
+            topN_prob1_r <= 32'b0;
+            topN_prob2_r <= 32'b0;
+            tmp_prob0_r <= 32'b0;
+            tmp_prob1_r <= 32'b0;
+            tmp_prob2_r <= 32'b0;
+            this_prob_r <= '{3{32'b0}};
+            tmp_seq_r <= '{3{32'b0}};
             topN_seq0_r <= 120'b0;
             topN_seq1_r <= 120'b0;
             topN_seq2_r <= 120'b0;
