@@ -8,3 +8,4 @@ INCA_libs
 ./sim/*.history
 ./sim/*.fsdb
 __pycache__
+.DS_Store
